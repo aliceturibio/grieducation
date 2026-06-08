@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRI Institute · CRM Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #16161f;
+  --surface3: #1c1c28;
+  --border: #222230;
+  --border2: #2a2a3a;
+  --text: #e8e8f0;
+  --text2: #9090a8;
+  --text3: #505068;
+  --accent: #4f6ef7;
+  --accent2: #6e87ff;
+  --green: #2ecc8a;
+  --orange: #f5a623;
+  --red: #f75757;
+  --blue: #57b8f7;
+  --purple: #a855f7;
+  --yellow: #f7d057;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  gap: 12px; flex-wrap: wrap;
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px; font-weight: 800; letter-spacing: -.3px;
+  color: var(--text);
+}
+.logo span { color: var(--accent2); }
+
+.badge {
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  padding: 3px 10px; border-radius: 20px;
+  display: flex; align-items: center; gap: 5px;
+}
+.badge-live { background: rgba(46,204,138,.1); color: var(--green); border: 1px solid rgba(46,204,138,.2); }
+.badge-demo { background: rgba(247,215,87,.08); color: var(--yellow); border: 1px solid rgba(247,215,87,.15); }
+.badge-error { background: rgba(247,87,87,.1); color: var(--red); border: 1px solid rgba(247,87,87,.2); }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.dot-pulse { animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  padding: 8px 16px; border-radius: 8px;
+  border: none; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:hover { background: var(--surface3); color: var(--text); }
+.btn-green { background: rgba(46,204,138,.15); color: var(--green); border: 1px solid rgba(46,204,138,.2); }
+.btn-green:hover { background: rgba(46,204,138,.25); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; height: calc(100vh - 52px); }
+
+.sidebar {
+  width: 220px; min-width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  display: flex; flex-direction: column; gap: 4px;
+  overflow-y: auto;
+}
+.nav-section { padding: 0 16px 8px; font-size: 10px; font-weight: 600; letter-spacing: .08em; color: var(--text3); text-transform: uppercase; margin-top: 8px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; cursor: pointer;
+  font-size: 13px; color: var(--text2);
+  transition: all .12s; border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.nav-item:hover { background: var(--surface3); color: var(--text); }
+.nav-item.active { background: rgba(79,110,247,.1); color: var(--accent2); border-left-color: var(--accent); }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-count { margin-left: auto; font-size: 11px; font-family: 'DM Mono'; color: var(--text3); background: var(--surface3); padding: 2px 6px; border-radius: 10px; }
+
+.main { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* ── CONNECT SCREEN ── */
+#connect-screen {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; gap: 28px; text-align: center;
+}
+.connect-card {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 48px 52px;
+  max-width: 480px; width: 100%;
+}
+.connect-icon { font-size: 48px; margin-bottom: 16px; }
+.connect-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.connect-desc { color: var(--text2); font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
+.connect-sheet-id {
+  background: var(--surface3); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 12px 16px;
+  font-family: 'DM Mono', monospace; font-size: 12px;
+  color: var(--accent2); margin-bottom: 20px;
+  word-break: break-all; text-align: left;
+}
+.connect-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text3); font-size: 12px; }
+.connect-divider::before, .connect-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.file-drop {
+  border: 2px dashed var(--border2); border-radius: 12px;
+  padding: 20px; cursor: pointer; transition: all .15s;
+  font-size: 13px; color: var(--text2);
+}
+.file-drop:hover { border-color: var(--accent); color: var(--accent2); background: rgba(79,110,247,.05); }
+
+/* ── STATS ROW ── */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.stat-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px;
+}
+.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+.stat-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.stat-fire { color: #ff6b35; }
+.stat-orange { color: var(--orange); }
+.stat-yellow { color: var(--yellow); }
+.stat-blue { color: var(--blue); }
+.stat-green { color: var(--green); }
+.stat-purple { color: var(--purple); }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.search-box {
+  flex: 1; min-width: 220px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 9px 14px;
+  color: var(--text); font-size: 13px; font-family: 'DM Sans';
+  outline: none; transition: border .15s;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--text3); }
+
+.filter-select {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 9px 12px;
+  color: var(--text2); font-size: 13px; font-family: 'DM Sans';
+  outline: none; cursor: pointer; min-width: 140px;
+}
+.filter-select:focus { border-color: var(--accent); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 10px 12px;
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  color: var(--text3); text-transform: uppercase;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+th:hover { color: var(--text2); }
+td {
+  padding: 10px 12px; border-bottom: 1px solid var(--border);
+  vertical-align: middle; max-width: 220px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+tr:hover td { background: var(--surface2); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 20px;
+  white-space: nowrap;
+}
+.chip-fire { background: rgba(255,107,53,.12); color: #ff8c5a; border: 1px solid rgba(255,107,53,.2); }
+.chip-orange { background: rgba(245,166,35,.12); color: var(--orange); border: 1px solid rgba(245,166,35,.2); }
+.chip-yellow { background: rgba(247,208,87,.1); color: var(--yellow); border: 1px solid rgba(247,208,87,.2); }
+.chip-blue { background: rgba(87,184,247,.1); color: var(--blue); border: 1px solid rgba(87,184,247,.2); }
+.chip-gray { background: rgba(255,255,255,.05); color: var(--text3); border: 1px solid var(--border); }
+.chip-green { background: rgba(46,204,138,.1); color: var(--green); border: 1px solid rgba(46,204,138,.2); }
+.chip-purple { background: rgba(168,85,247,.1); color: var(--purple); border: 1px solid rgba(168,85,247,.2); }
+.chip-red { background: rgba(247,87,87,.1); color: var(--red); border: 1px solid rgba(247,87,87,.2); }
+
+.product-re { color: #4fc3f7; }
+.product-bt { color: var(--accent2); }
+.product-ia { color: var(--purple); }
+
+/* ── PAGINATION ── */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; font-size: 13px; color: var(--text2);
+  flex-wrap: wrap; gap: 10px;
+}
+.page-btns { display: flex; gap: 6px; }
+.page-btn {
+  width: 32px; height: 32px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); cursor: pointer; font-size: 13px; transition: all .12s;
+}
+.page-btn:hover { background: var(--surface3); color: var(--text); }
+.page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.page-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* ── TAB PILLS ── */
+.tab-pills { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.tab-pill {
+  padding: 7px 16px; border-radius: 20px; font-size: 13px;
+  border: 1px solid var(--border2); cursor: pointer;
+  background: transparent; color: var(--text2); transition: all .12s;
+}
+.tab-pill:hover { background: var(--surface3); color: var(--text); }
+.tab-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+/* ── LOADING ── */
+.loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; height: 200px; gap: 14px; color: var(--text3);
+}
+.spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid var(--border2); border-top-color: var(--accent);
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.7); align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 16px; padding: 28px 32px;
+  max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+.modal-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.modal-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; width: 110px; min-width: 110px; padding-top: 2px; }
+.modal-val { font-size: 13px; color: var(--text); line-height: 1.5; }
+.modal-close { float: right; background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; margin-top: -4px; }
+.modal-close:hover { color: var(--text); }
+
+/* ── ALERT ── */
+.alert {
+  display: none; padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; margin-bottom: 14px; align-items: center; gap: 8px;
+}
+.alert.show { display: flex; }
+.alert-info { background: rgba(79,110,247,.1); color: var(--accent2); border: 1px solid rgba(79,110,247,.2); }
+.alert-success { background: rgba(46,204,138,.1); color: var(--green); border: 1px solid rgba(46,204,138,.2); }
+.alert-error { background: rgba(247,87,87,.1); color: var(--red); border: 1px solid rgba(247,87,87,.2); }
+
+/* ── PIPELINE BAR ── */
+.pipeline-bar { margin-bottom: 20px; }
+.pipeline-track { height: 8px; border-radius: 4px; background: var(--surface3); overflow: hidden; display: flex; }
+.pipeline-seg { height: 100%; transition: width .5s ease; }
+.pipeline-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; font-size: 12px; color: var(--text2); }
+.pipeline-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 48px; color: var(--text3); }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+/* ── RANKING ── */
+.rank-podium { display: flex; gap: 16px; margin-bottom: 28px; align-items: flex-end; }
+.rank-card {
+  flex: 1; border-radius: 16px; padding: 24px 20px 20px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  position: relative; overflow: hidden;
+  transition: transform .15s;
+}
+.rank-card:hover { transform: translateY(-2px); }
+.rank-card.rank-1 { border-color: rgba(255,215,0,.3); background: linear-gradient(135deg, rgba(255,215,0,.06) 0%, var(--surface2) 60%); }
+.rank-card.rank-2 { border-color: rgba(192,192,192,.25); background: linear-gradient(135deg, rgba(192,192,192,.05) 0%, var(--surface2) 60%); }
+.rank-card.rank-3 { border-color: rgba(205,127,50,.25); background: linear-gradient(135deg, rgba(205,127,50,.05) 0%, var(--surface2) 60%); }
+.rank-medal { font-size: 28px; margin-bottom: 10px; display: block; }
+.rank-position { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.rank-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.rank-stat { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.rank-stat:last-child { border-bottom: none; }
+.rank-stat-label { color: var(--text3); font-size: 12px; }
+.rank-stat-val { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; }
+.rank-bar-wrap { margin: 12px 0 4px; }
+.rank-bar-track { height: 4px; border-radius: 2px; background: var(--surface3); overflow: hidden; }
+.rank-bar-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
+.rank-activity { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.rank-activity-title { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.rank-status-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; font-size: 12px; }
+.rank-status-bar { height: 3px; border-radius: 2px; margin-top: 2px; }
+
+.rank-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+.rank-table th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface2); }
+.rank-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.rank-table tr:hover td { background: var(--surface2); }
+.rank-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); }
+.conv-rate { font-family: 'DM Mono', monospace; font-size: 12px; }
+
+/* ── RANKING ── */
+.resp-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: var(--surface3); color: var(--text2);
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">GRI <span>Institute</span></div>
+    <div class="badge badge-demo" id="status-badge">
+      <span class="dot"></span>
+      <span id="status-text">Sem dados</span>
+    </div>
+    <div style="font-size:11px;color:var(--text3);font-family:'DM Mono'" id="last-update"></div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ghost" id="btn-refresh" onclick="refreshData()" style="display:none">
+      ↻ Atualizar
+    </button>
+    <button class="btn btn-ghost" id="btn-upload" onclick="document.getElementById('file-input').click()">
+      📂 Abrir planilha
+    </button>
+    <button class="btn btn-primary" id="btn-connect" onclick="focusUrlInput()">
+      ▶ Conectar Google Sheets
+    </button>
+    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFile(event)">
+  </div>
+</div>
+
+<!-- GLOBAL ALERT BAR (below topbar, always visible) -->
+<div id="global-alert" style="display:none;padding:10px 28px;font-size:13px;align-items:center;gap:8px;border-bottom:1px solid transparent"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-section">Visão</div>
+    <div class="nav-item active" onclick="showTab('overview',this)" data-tab="overview">
+      <span class="nav-icon">📊</span> Overview
+    </div>
+    <div class="nav-item" onclick="showTab('leads',this)" data-tab="leads">
+      <span class="nav-icon">🔥</span> Ligar Hoje
+      <span class="nav-count" id="nav-hot">0</span>
+    </div>
+    <div class="nav-item" onclick="showTab('all',this)" data-tab="all">
+      <span class="nav-icon">📋</span> Todos os Leads
+      <span class="nav-count" id="nav-all">0</span>
+    </div>
+    <div class="nav-section">Produto</div>
+    <div class="nav-item" onclick="showTab('realestate',this)" data-tab="realestate">
+      <span class="nav-icon">🏠</span> Real Estate
+      <span class="nav-count" id="nav-re">0</span>
+    </div>
+    <div class="nav-item" onclick="showTab('building',this)" data-tab="building">
+      <span class="nav-icon">🚀</span> Building Tomorrow
+      <span class="nav-count" id="nav-bt">0</span>
+    </div>
+    <div class="nav-item" onclick="showTab('eficiencia',this)" data-tab="eficiencia">
+      <span class="nav-icon">🤖</span> eficiêncIA
+      <span class="nav-count" id="nav-ia">0</span>
+    </div>
+    <div class="nav-section">Time</div>
+    <div class="nav-item" onclick="showTab('ranking',this)" data-tab="ranking">
+      <span class="nav-icon">🏆</span> Ranking Vendedores
+    </div>
+    <div class="nav-item" onclick="showTab('sem-acao',this)" data-tab="sem-acao">
+      <span class="nav-icon">⏳</span> Sem ação
+      <span class="nav-count" id="nav-semacao">0</span>
+    </div>
+    <div class="nav-item" onclick="showTab('pipeline',this)" data-tab="pipeline">
+      <span class="nav-icon">💰</span> Pipeline
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-content">
+
+    <!-- CONNECT SCREEN -->
+    <div id="connect-screen">
+      <div class="connect-card">
+        <div class="connect-icon">📊</div>
+        <div class="connect-title">GRI Institute · CRM Dashboard</div>
+        <div class="connect-desc">Cole a URL do Apps Script da planilha para conectar ao vivo — sem login, sem upload.</div>
+
+        <div style="text-align:left;margin-bottom:16px">
+          <label style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">URL do Apps Script (Web App)</label>
+          <div style="display:flex;gap:8px">
+            <input id="apps-script-url" type="text"
+              placeholder="https://script.google.com/macros/s/.../exec"
+              style="flex:1;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:12px;font-family:'DM Mono';outline:none"
+              onkeydown="if(event.key==='Enter')connectAppsScript()"
+            >
+            <button class="btn btn-primary" onclick="connectAppsScript()" style="white-space:nowrap">Conectar →</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">
+            Não tem ainda? Veja as instruções abaixo ↓
+          </div>
+        </div>
+
+        <details style="text-align:left;margin-bottom:16px">
+          <summary style="font-size:12px;color:var(--text2);cursor:pointer;padding:10px 14px;background:var(--surface3);border-radius:8px;list-style:none;display:flex;align-items:center;justify-content:space-between">
+            📋 Como gerar a URL (3 passos) <span style="color:var(--text3)">▾</span>
+          </summary>
+          <div style="background:var(--surface3);border-radius:0 0 8px 8px;padding:14px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.8">
+            <strong style="color:var(--text)">1.</strong> Na planilha, clique em <strong>Extensões → Apps Script</strong><br>
+            <strong style="color:var(--text)">2.</strong> Apague tudo e cole o código do arquivo <code style="font-family:'DM Mono';background:var(--surface2);padding:1px 5px;border-radius:4px">gri_api_script.gs</code> (disponível para download abaixo)<br>
+            <strong style="color:var(--text)">3.</strong> Clique em <strong>Implantar → Nova implantação</strong> → tipo <strong>Web app</strong> → Executar como: <strong>Eu</strong> → Acesso: <strong>Qualquer pessoa</strong> → Implantar → copie a URL
+          </div>
+        </details>
+
+        <div class="connect-divider">ou carregue um arquivo local</div>
+        <div class="file-drop" onclick="document.getElementById('file-input').click()">
+          📂 Abrir planilha .xlsx / .csv
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD CONTENT (hidden until data loaded) -->
+    <div id="dashboard" style="display:none">
+      <div class="alert alert-info" id="main-alert"></div>
+
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview" class="tab-content">
+        <div class="section-title">📊 Resumo da base</div>
+        <div class="stats-row" id="stats-row"></div>
+        <div class="pipeline-bar" id="pipeline-bar"></div>
+        <div class="section-title">🔥 Ligar HOJE — Top 20</div>
+        <div class="table-wrap"><table id="table-hot"></table></div>
+      </div>
+
+      <!-- LEADS TAB -->
+      <div id="tab-leads" class="tab-content" style="display:none">
+        <div class="section-title">🔥 Leads para Ligar Hoje</div>
+        <div class="toolbar">
+          <input class="search-box" id="search-leads" placeholder="🔍 Buscar por nome, empresa, cargo..." oninput="renderTable('leads')">
+          <select class="filter-select" id="filter-resp-leads" onchange="renderTable('leads')"><option value="">Todos responsáveis</option></select>
+          <select class="filter-select" id="filter-prod-leads" onchange="renderTable('leads')"><option value="">Todos produtos</option></select>
+        </div>
+        <div class="table-wrap"><table id="table-leads"></table></div>
+        <div class="pagination" id="pag-leads"></div>
+      </div>
+
+      <!-- ALL LEADS TAB -->
+      <div id="tab-all" class="tab-content" style="display:none">
+        <div class="section-title">📋 Todos os Leads</div>
+        <div class="toolbar">
+          <input class="search-box" id="search-all" placeholder="🔍 Buscar..." oninput="renderTable('all')">
+          <select class="filter-select" id="filter-prio-all" onchange="renderTable('all')">
+            <option value="">Todas prioridades</option>
+            <option value="SUPER QUENTE">🔥 Super Quente</option>
+            <option value="QUENTE">🟠 Quente</option>
+            <option value="MORNO">🟡 Morno</option>
+            <option value="FRIO">🔵 Frio</option>
+            <option value="MUITO FRIO">⚪ Muito Frio</option>
+          </select>
+          <select class="filter-select" id="filter-resp-all" onchange="renderTable('all')"><option value="">Todos responsáveis</option></select>
+          <select class="filter-select" id="filter-prod-all" onchange="renderTable('all')"><option value="">Todos produtos</option></select>
+          <select class="filter-select" id="filter-status-all" onchange="renderTable('all')">
+            <option value="">Todos status</option>
+            <option value="sem-status">Sem status</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="table-all"></table></div>
+        <div class="pagination" id="pag-all"></div>
+      </div>
+
+      <!-- REAL ESTATE TAB -->
+      <div id="tab-realestate" class="tab-content" style="display:none">
+        <div class="section-title">🏠 GRI Real Estate Immersion</div>
+        <div class="toolbar">
+          <input class="search-box" id="search-re" placeholder="🔍 Buscar..." oninput="renderTable('re')">
+          <select class="filter-select" id="filter-prio-re" onchange="renderTable('re')">
+            <option value="">Todas prioridades</option>
+            <option value="SUPER QUENTE">🔥 Super Quente</option>
+            <option value="QUENTE">🟠 Quente</option>
+            <option value="MORNO">🟡 Morno</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="table-re"></table></div>
+        <div class="pagination" id="pag-re"></div>
+      </div>
+
+      <!-- BUILDING TOMORROW TAB -->
+      <div id="tab-building" class="tab-content" style="display:none">
+        <div class="section-title">🚀 Building Tomorrow</div>
+        <div class="toolbar">
+          <input class="search-box" id="search-bt" placeholder="🔍 Buscar..." oninput="renderTable('bt')">
+          <select class="filter-select" id="filter-prio-bt" onchange="renderTable('bt')">
+            <option value="">Todas prioridades</option>
+            <option value="SUPER QUENTE">🔥 Super Quente</option>
+            <option value="QUENTE">🟠 Quente</option>
+            <option value="MORNO">🟡 Morno</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="table-bt"></table></div>
+        <div class="pagination" id="pag-bt"></div>
+      </div>
+
+      <!-- EFICIENCIA TAB -->
+      <div id="tab-eficiencia" class="tab-content" style="display:none">
+        <div class="section-title">🤖 eficiêncIA</div>
+        <div class="toolbar">
+          <input class="search-box" id="search-ia" placeholder="🔍 Buscar..." oninput="renderTable('ia')">
+        </div>
+        <div class="table-wrap"><table id="table-ia"></table></div>
+        <div class="pagination" id="pag-ia"></div>
+      </div>
+
+      <!-- SEM AÇÃO TAB -->
+      <div id="tab-sem-acao" class="tab-content" style="display:none">
+        <div class="section-title">⏳ Leads sem ação (Status vazio)</div>
+        <div class="toolbar">
+          <input class="search-box" id="search-sa" placeholder="🔍 Buscar..." oninput="renderTable('sa')">
+          <select class="filter-select" id="filter-prio-sa" onchange="renderTable('sa')">
+            <option value="">Todas prioridades</option>
+            <option value="SUPER QUENTE">🔥 Super Quente</option>
+            <option value="QUENTE">🟠 Quente</option>
+            <option value="MORNO">🟡 Morno</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table id="table-sa"></table></div>
+        <div class="pagination" id="pag-sa"></div>
+      </div>
+
+      <!-- RANKING TAB -->
+      <div id="tab-ranking" class="tab-content" style="display:none">
+        <div class="section-title">🏆 Ranking do Time Comercial</div>
+        <div id="ranking-content"></div>
+      </div>
+
+      <!-- PIPELINE TAB -->
+      <div id="tab-pipeline" class="tab-content" style="display:none">
+        <div class="section-title">💰 Pipeline Estimado</div>
+        <div id="pipeline-content"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const SHEET_ID = '1gJgIFwh6hZLxko7XI4DqnqOUQ-8PnBa0Tu2gjKKHb60';
+const SHEET_NAME = 'Leads Qualificados';
+const ROWS_PER_PAGE = 50;
+
+// Google OAuth (use own client id in production — this uses a public one for demo)
+// For self-hosted: create project at console.cloud.google.com → OAuth 2.0 Client ID → Web app
+const GOOGLE_CLIENT_ID = ''; // filled by user or leave blank for file-only mode
+const SCOPE = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+
+let allLeads = [];
+let gToken = null;
+let sortState = {};
+let pages = {};
+
+// ─────────────────────────────────────────────
+// GOOGLE AUTH
+// ─────────────────────────────────────────────
+function startGoogleAuth() {
+  if (!GOOGLE_CLIENT_ID) {
+    showGlobalAlert('alert-info', '⚠️ A conexão ao vivo requer um Google Client ID configurado. Use o botão "Abrir planilha" para carregar o arquivo .xlsx exportado do Google Sheets.');
+    // Also highlight the upload button
+    const uploadBtn = document.getElementById('btn-upload');
+    uploadBtn.style.background = 'rgba(79,110,247,.15)';
+    uploadBtn.style.borderColor = 'var(--accent)';
+    uploadBtn.style.color = 'var(--accent2)';
+    setTimeout(() => {
+      uploadBtn.style.background = '';
+      uploadBtn.style.borderColor = '';
+      uploadBtn.style.color = '';
+    }, 3000);
+    return;
+  }
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: window.location.href.split('?')[0],
+    response_type: 'token',
+    scope: SCOPE,
+    prompt: 'select_account'
+  });
+  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+function checkOAuthCallback() {
+  const hash = window.location.hash;
+  if (!hash.includes('access_token')) return;
+  const params = new URLSearchParams(hash.substring(1));
+  gToken = params.get('access_token');
+  if (gToken) {
+    history.replaceState(null, '', window.location.pathname);
+    fetchSheetData();
+  }
+}
+
+async function fetchSheetData() {
+  showLoading();
+  setBadge('loading', 'Carregando...');
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}?key=&access_token=${gToken}`;
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}`, {
+      headers: { Authorization: `Bearer ${gToken}` }
+    });
+    if (!res.ok) throw new Error('Erro ' + res.status);
+    const data = await res.json();
+    processSheetData(data.values);
+    setBadge('live', '● Google Sheets ao vivo');
+    document.getElementById('last-update').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+    document.getElementById('btn-refresh').style.display = 'flex';
+  } catch (e) {
+    setBadge('error', 'Erro: ' + e.message);
+    showAlert('alert-error', '❌ Erro ao buscar dados: ' + e.message);
+  }
+}
+
+function focusUrlInput() {
+  const input = document.getElementById('apps-script-url');
+  if (input) {
+    input.focus();
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.style.borderColor = 'var(--accent)';
+    setTimeout(() => input.style.borderColor = '', 2000);
+  }
+}
+
+function jsonp(url, callback) {
+  const cbName = '_gri_cb_' + Date.now();
+  const script = document.createElement('script');
+  const sep = url.includes('?') ? '&' : '?';
+  script.src = url + sep + 'callback=' + cbName + '&sheet=Leads+Qualificados';
+  script.onerror = () => {
+    delete window[cbName];
+    document.body.removeChild(script);
+    callback(new Error('Falha ao carregar o script. Verifique a URL e as permissões.'), null);
+  };
+  window[cbName] = (data) => {
+    delete window[cbName];
+    document.body.removeChild(script);
+    callback(null, data);
+  };
+  // Timeout after 10s
+  setTimeout(() => {
+    if (window[cbName]) {
+      window[cbName] = () => {};
+      callback(new Error('Timeout — o script demorou mais de 10s para responder.'), null);
+    }
+  }, 10000);
+  document.body.appendChild(script);
+}
+
+function connectAppsScript() {
+  const url = (document.getElementById('apps-script-url')?.value || '').trim();
+  if (!url) {
+    showGlobalAlert('alert-error', '❌ Cole a URL do Apps Script antes de conectar.');
+    focusUrlInput();
+    return;
+  }
+  if (!url.includes('script.google.com')) {
+    showGlobalAlert('alert-error', '❌ URL inválida. Deve ser do tipo https://script.google.com/macros/s/.../exec');
+    return;
+  }
+
+  setBadge('loading', 'Conectando...');
+  showGlobalAlert('alert-info', '⏳ Conectando ao Google Sheets...');
+
+  jsonp(url, (err, data) => {
+    if (err) {
+      setBadge('error', 'Erro de conexão');
+      showGlobalAlert('alert-error', '❌ ' + err.message);
+      return;
+    }
+    if (!data.rows || !data.rows.length) {
+      setBadge('error', 'Sem dados');
+      showGlobalAlert('alert-error', '❌ Planilha vazia ou aba "Leads Qualificados" não encontrada.');
+      return;
+    }
+    processRows(data.rows);
+    window._appsScriptUrl = url;
+    setBadge('live', '● Google Sheets ao vivo');
+    document.getElementById('last-update').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+    document.getElementById('btn-refresh').style.display = 'flex';
+    showGlobalAlert('alert-success', '✅ Conectado! ' + data.total + ' leads carregados.');
+  });
+}
+
+function refreshData() {
+  if (window._appsScriptUrl) {
+    setBadge('loading', 'Atualizando...');
+    jsonp(window._appsScriptUrl, (err, data) => {
+      if (err) { showGlobalAlert('alert-error', '❌ ' + err.message); return; }
+      processRows(data.rows);
+      setBadge('live', '● Google Sheets ao vivo');
+      document.getElementById('last-update').textContent = 'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+      showGlobalAlert('alert-success', '✅ Dados atualizados — ' + data.total + ' leads.');
+    });
+  } else if (gToken) {
+    fetchSheetData();
+  }
+}
+
+// ─────────────────────────────────────────────
+// FILE UPLOAD
+// ─────────────────────────────────────────────
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const wb = XLSX.read(ev.target.result, { type: 'array' });
+    const preferred = ['Leads Qualificados','🔥 Ligar Hoje','Sheet1'];
+    const sn = preferred.find(n => wb.SheetNames.includes(n)) || wb.SheetNames[0];
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval: '' });
+    processRows(rows);
+    setBadge('live', '📂 ' + file.name);
+    document.getElementById('last-update').textContent = 'Carregado: ' + new Date().toLocaleTimeString('pt-BR');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ─────────────────────────────────────────────
+// PROCESS DATA
+// ─────────────────────────────────────────────
+function processSheetData(values) {
+  if (!values || values.length < 2) { showAlert('alert-error','Planilha vazia'); return; }
+  const headers = values[0];
+  const rows = values.slice(1).map(row => {
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = row[i] || ''; });
+    return obj;
+  });
+  processRows(rows);
+}
+
+function processRows(rows) {
+  // Normalize column names
+  allLeads = rows.filter(r => r['Nome'] || r['name'] || r['Email']).map((r, i) => ({
+    id: i,
+    nome: r['Nome'] || r['name'] || r['First Name'] || '',
+    empresa: r['Empresa'] || r['company'] || r['*Company'] || '',
+    cargo: r['Cargo'] || r['role'] || '',
+    cidade: r['Cidade'] || r['city'] || '',
+    telefone: r['Telefone'] || r['phone'] || r['Phone Number'] || '',
+    email: r['Email'] || r['email'] || '',
+    score: parseInt(r['Score'] || r['score'] || '0') || 0,
+    prioridade: normalizePrio(r['Prioridade'] || r['priority'] || ''),
+    produto: normalizeProd(r['Produto'] || r['product'] || ''),
+    status: r['Status'] || r['status'] || '',
+    responsavel: r['Responsável'] || r['Responsavel'] || r['responsavel'] || '',
+    porte: r['Porte'] || '',
+    raw: r
+  }));
+
+  buildFilterOptions();
+  updateNavCounts();
+  renderOverview();
+  document.getElementById('connect-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+}
+
+function normalizePrio(p) {
+  const s = String(p).toUpperCase().replace(/[^A-Z ]/g,'').trim();
+  if (s.includes('SUPER')) return 'SUPER QUENTE';
+  if (s.includes('QUENTE')) return 'QUENTE';
+  if (s.includes('MORNO')) return 'MORNO';
+  if (s.includes('FRIO') && s.includes('MUITO')) return 'MUITO FRIO';
+  if (s.includes('FRIO')) return 'FRIO';
+  return s || '—';
+}
+
+function normalizeProd(p) {
+  const s = String(p).toLowerCase();
+  if (s.includes('real estate') || s.includes('imersão') || s.includes('immersion')) return 'Real Estate Immersion';
+  if (s.includes('building') || s.includes('tomorrow')) return 'Building Tomorrow';
+  if (s.includes('eficiência') || s.includes('eficiencia') || s.includes('ia')) return 'eficiêncIA';
+  return p || '—';
+}
+
+// ─────────────────────────────────────────────
+// OVERVIEW
+// ─────────────────────────────────────────────
+function renderOverview() {
+  const total = allLeads.length;
+  const hot = allLeads.filter(l => l.prioridade === 'SUPER QUENTE').length;
+  const quente = allLeads.filter(l => l.prioridade === 'QUENTE').length;
+  const morno = allLeads.filter(l => l.prioridade === 'MORNO').length;
+  const frio = allLeads.filter(l => l.prioridade === 'FRIO' || l.prioridade === 'MUITO FRIO').length;
+  const re = allLeads.filter(l => l.produto.includes('Real Estate')).length;
+  const bt = allLeads.filter(l => l.produto.includes('Building')).length;
+  const ia = allLeads.filter(l => l.produto.includes('eficiê')).length;
+
+  const pipeRE = re * 20000 * 0.35;
+  const pipeBT = bt * 80000 * 0.25;
+  const pipeIA = ia * 3000 * 0.5;
+  const pipeTotal = pipeRE + pipeBT + pipeIA;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total de Leads</div><div class="stat-value" style="color:var(--text)">${total.toLocaleString()}</div></div>
+    <div class="stat-card"><div class="stat-label">🔥 Super Quente</div><div class="stat-value stat-fire">${hot}</div><div class="stat-sub">Ligar hoje</div></div>
+    <div class="stat-card"><div class="stat-label">🟠 Quente</div><div class="stat-value stat-orange">${quente}</div><div class="stat-sub">24h</div></div>
+    <div class="stat-card"><div class="stat-label">🟡 Morno</div><div class="stat-value stat-yellow">${morno}</div><div class="stat-sub">Esta semana</div></div>
+    <div class="stat-card"><div class="stat-label">🏠 Real Estate</div><div class="stat-value" style="color:#4fc3f7">${re}</div></div>
+    <div class="stat-card"><div class="stat-label">🚀 Building Tomorrow</div><div class="stat-value stat-blue">${bt}</div></div>
+    <div class="stat-card"><div class="stat-label">💰 Pipeline Est.</div><div class="stat-value stat-green">R$${(pipeTotal/1e6).toFixed(1)}M</div></div>
+  `;
+
+  // Pipeline bar
+  const barItems = [
+    { label: 'Super Quente', count: hot, color: '#ff6b35' },
+    { label: 'Quente', count: quente, color: '#f5a623' },
+    { label: 'Morno', count: morno, color: '#f7d057' },
+    { label: 'Frio', count: frio, color: '#57b8f7' },
+  ];
+  const barTotal = hot + quente + morno + frio;
+  document.getElementById('pipeline-bar').innerHTML = `
+    <div class="pipeline-track">
+      ${barItems.map(b => `<div class="pipeline-seg" style="width:${barTotal?((b.count/barTotal)*100).toFixed(1):0}%;background:${b.color}"></div>`).join('')}
+    </div>
+    <div class="pipeline-legend">
+      ${barItems.map(b => `<span><span class="pipeline-dot" style="background:${b.color}"></span>${b.label}: ${b.count}</span>`).join('')}
+    </div>
+  `;
+
+  // Top 20 hot leads
+  const hotLeads = [...allLeads]
+    .filter(l => l.prioridade === 'SUPER QUENTE' || l.prioridade === 'QUENTE')
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 20);
+  renderLeadsTable('table-hot', hotLeads, false);
+}
+
+// ─────────────────────────────────────────────
+// TABLE RENDER
+// ─────────────────────────────────────────────
+function getFilteredLeads(tab) {
+  let leads = [];
+  if (tab === 'leads') {
+    leads = allLeads.filter(l => l.prioridade === 'SUPER QUENTE' || l.prioridade === 'QUENTE');
+    const q = (document.getElementById('search-leads')?.value || '').toLowerCase();
+    const resp = document.getElementById('filter-resp-leads')?.value || '';
+    const prod = document.getElementById('filter-prod-leads')?.value || '';
+    if (q) leads = leads.filter(l => (l.nome+l.empresa+l.cargo).toLowerCase().includes(q));
+    if (resp) leads = leads.filter(l => l.responsavel.toLowerCase() === resp.toLowerCase());
+    if (prod) leads = leads.filter(l => l.produto.includes(prod));
+  } else if (tab === 'all') {
+    leads = [...allLeads];
+    const q = (document.getElementById('search-all')?.value || '').toLowerCase();
+    const prio = document.getElementById('filter-prio-all')?.value || '';
+    const resp = document.getElementById('filter-resp-all')?.value || '';
+    const prod = document.getElementById('filter-prod-all')?.value || '';
+    const status = document.getElementById('filter-status-all')?.value || '';
+    if (q) leads = leads.filter(l => (l.nome+l.empresa+l.cargo).toLowerCase().includes(q));
+    if (prio) leads = leads.filter(l => l.prioridade.includes(prio));
+    if (resp) leads = leads.filter(l => l.responsavel.toLowerCase() === resp.toLowerCase());
+    if (prod) leads = leads.filter(l => l.produto.includes(prod));
+    if (status === 'sem-status') leads = leads.filter(l => !l.status);
+  } else if (tab === 're') {
+    leads = allLeads.filter(l => l.produto.includes('Real Estate'));
+    const q = (document.getElementById('search-re')?.value || '').toLowerCase();
+    const prio = document.getElementById('filter-prio-re')?.value || '';
+    if (q) leads = leads.filter(l => (l.nome+l.empresa+l.cargo).toLowerCase().includes(q));
+    if (prio) leads = leads.filter(l => l.prioridade.includes(prio));
+  } else if (tab === 'bt') {
+    leads = allLeads.filter(l => l.produto.includes('Building'));
+    const q = (document.getElementById('search-bt')?.value || '').toLowerCase();
+    const prio = document.getElementById('filter-prio-bt')?.value || '';
+    if (q) leads = leads.filter(l => (l.nome+l.empresa+l.cargo).toLowerCase().includes(q));
+    if (prio) leads = leads.filter(l => l.prioridade.includes(prio));
+  } else if (tab === 'ia') {
+    leads = allLeads.filter(l => l.produto.includes('eficiê'));
+    const q = (document.getElementById('search-ia')?.value || '').toLowerCase();
+    if (q) leads = leads.filter(l => (l.nome+l.empresa+l.cargo).toLowerCase().includes(q));
+  } else if (tab === 'sa') {
+    leads = allLeads.filter(l => !l.status);
+    const q = (document.getElementById('search-sa')?.value || '').toLowerCase();
+    const prio = document.getElementById('filter-prio-sa')?.value || '';
+    if (q) leads = leads.filter(l => (l.nome+l.empresa+l.cargo).toLowerCase().includes(q));
+    if (prio) leads = leads.filter(l => l.prioridade.includes(prio));
+  }
+  return [...leads].sort((a, b) => b.score - a.score);
+}
+
+const tabToTable = { leads:'table-leads', all:'table-all', re:'table-re', bt:'table-bt', ia:'table-ia', sa:'table-sa' };
+const tabToPag = { leads:'pag-leads', all:'pag-all', re:'pag-re', bt:'pag-bt', ia:'pag-ia', sa:'pag-sa' };
+
+function renderTable(tab) {
+  if (!pages[tab]) pages[tab] = 1;
+  const filtered = getFilteredLeads(tab);
+  const total = filtered.length;
+  const p = pages[tab];
+  const start = (p - 1) * ROWS_PER_PAGE;
+  const slice = filtered.slice(start, start + ROWS_PER_PAGE);
+
+  renderLeadsTable(tabToTable[tab], slice, true);
+  renderPagination(tabToPag[tab], total, p, tab);
+}
+
+function renderLeadsTable(tableId, leads, paginated) {
+  const el = document.getElementById(tableId);
+  if (!el) return;
+  if (!leads.length) {
+    el.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">🔍</div>Nenhum lead encontrado</div></td></tr>';
+    return;
+  }
+  el.innerHTML = `
+    <thead><tr>
+      <th>#</th>
+      <th>Nome</th>
+      <th>Empresa</th>
+      <th>Cargo</th>
+      <th>Score</th>
+      <th>Prioridade</th>
+      <th>Produto</th>
+      <th>Status</th>
+      <th>Resp.</th>
+    </tr></thead>
+    <tbody>
+      ${leads.map((l, i) => `
+        <tr onclick="openModal(${l.id})" style="cursor:pointer">
+          <td style="color:var(--text3);font-family:'DM Mono';font-size:11px">${l.score || i+1}</td>
+          <td style="font-weight:500;color:var(--text)">${esc(l.nome) || '—'}</td>
+          <td style="color:var(--text2)">${esc(l.empresa) || '—'}</td>
+          <td style="color:var(--text3)">${esc(l.cargo) || '—'}</td>
+          <td style="font-family:'DM Mono';font-size:12px;color:var(--text2)">${l.score || '—'}</td>
+          <td>${prioChip(l.prioridade)}</td>
+          <td>${prodBadge(l.produto)}</td>
+          <td>${statusBadge(l.status)}</td>
+          <td>${l.responsavel ? `<span class="resp-tag">${esc(l.responsavel)}</span>` : '—'}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  `;
+}
+
+function renderPagination(pagId, total, current, tab) {
+  const el = document.getElementById(pagId);
+  if (!el) return;
+  const totalPages = Math.ceil(total / ROWS_PER_PAGE);
+  if (totalPages <= 1) { el.innerHTML = `<span>${total} lead${total !== 1 ? 's' : ''}</span>`; return; }
+
+  let pageNums = [];
+  for (let i = Math.max(1, current-2); i <= Math.min(totalPages, current+2); i++) pageNums.push(i);
+
+  el.innerHTML = `
+    <span>${total} leads · Pág. ${current} de ${totalPages}</span>
+    <div class="page-btns">
+      <button class="page-btn" ${current===1?'disabled':''} onclick="goPage('${tab}',${current-1})">‹</button>
+      ${pageNums.map(n => `<button class="page-btn ${n===current?'active':''}" onclick="goPage('${tab}',${n})">${n}</button>`).join('')}
+      <button class="page-btn" ${current===totalPages?'disabled':''} onclick="goPage('${tab}',${current+1})">›</button>
+    </div>
+  `;
+}
+
+function goPage(tab, p) {
+  pages[tab] = p;
+  renderTable(tab);
+}
+
+// ─────────────────────────────────────────────
+// PIPELINE TAB
+// ─────────────────────────────────────────────
+function renderRankingTab() {
+  // Build from live data if available, else use embedded data
+  let vendedores = [];
+
+  if (allLeads.length > 0) {
+    // Build from loaded spreadsheet
+    const map = {};
+    allLeads.forEach(l => {
+      const r = l.responsavel || 'Sem responsável';
+      if (!map[r]) map[r] = { nome: r, leads: 0, com_status: 0, scores: [], pipeline: 0, produtos: {}, status_counts: {} };
+      map[r].leads++;
+      if (l.status) {
+        map[r].com_status++;
+        map[r].status_counts[l.status] = (map[r].status_counts[l.status] || 0) + 1;
+      }
+      if (l.score) map[r].scores.push(l.score);
+      const prod = l.produto || '—';
+      map[r].produtos[prod] = (map[r].produtos[prod] || 0) + 1;
+      const ticket = prod.includes('Building') ? 80000 : prod.includes('eficiê') ? 3000 : 20000;
+      map[r].pipeline += ticket * 0.35;
+    });
+    vendedores = Object.values(map)
+      .filter(v => v.nome !== 'Sem responsável' && v.leads > 0)
+      .map(v => ({ ...v, score_medio: v.scores.length ? Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length) : 0 }))
+      .sort((a, b) => b.com_status - a.com_status);
+  }
+
+  // Fallback to embedded data from planilha analysis
+  if (!vendedores.length) {
+    vendedores = [
+      { nome: 'Ana', leads: 127, com_status: 67, score_medio: 94, pipeline: 1225000,
+        produtos: {'GRI Real Estate Immersion': 111, 'Building Tomorrow': 16},
+        status_counts: {'Mensagem Enviada': 52, 'Contato feito': 6, 'Fup': 5, 'Reunião agendada': 1, 'Declinou': 1} },
+      { nome: 'Lucas X', leads: 86, com_status: 20, score_medio: 94, pipeline: 602000,
+        produtos: {'GRI Real Estate Immersion': 86},
+        status_counts: {'Mensagem Enviada': 20} },
+      { nome: 'Ju', leads: 16, com_status: 9, score_medio: 0, pipeline: 112000,
+        produtos: {'GRI Real Estate Immersion': 16},
+        status_counts: {'Mensagem enviada': 8, 'Reunião agendada': 1} },
+      { nome: 'Natália', leads: 6, com_status: 6, score_medio: 93, pipeline: 42000,
+        produtos: {'GRI Real Estate Immersion': 6},
+        status_counts: {'Mensagem Enviada': 6} }
+    ];
+  }
+
+  const maxLeads = Math.max(...vendedores.map(v => v.leads));
+  const maxStatus = Math.max(...vendedores.map(v => v.com_status));
+  const totalPipeline = vendedores.reduce((s, v) => s + v.pipeline, 0);
+  const totalLeads = vendedores.reduce((s, v) => s + v.leads, 0);
+  const totalStatus = vendedores.reduce((s, v) => s + v.com_status, 0);
+
+  const medals = ['🥇','🥈','🥉','4️⃣'];
+  const colors = ['#ffd700','#c0c0c0','#cd7f32','#6e87ff'];
+  const rankClasses = ['rank-1','rank-2','rank-3',''];
+
+  // Podium (top 3)
+  const top3 = vendedores.slice(0, 3);
+  const rest = vendedores.slice(3);
+
+  const podiumHTML = top3.map((v, i) => {
+    const convRate = v.leads > 0 ? ((v.com_status / v.leads) * 100).toFixed(0) : 0;
+    const statusEntries = Object.entries(v.status_counts || {}).sort((a,b)=>b[1]-a[1]).slice(0,4);
+    const maxStatusCount = statusEntries[0]?.[1] || 1;
+    const statusColors = { 'reunião': '#2ecc8a', 'agendada': '#2ecc8a', 'enviada': '#4f6ef7', 'contato': '#f5a623', 'fup': '#f7d057', 'declinou': '#f75757' };
+
+    return `
+    <div class="rank-card ${rankClasses[i]}">
+      <span class="rank-medal">${medals[i]}</span>
+      <div class="rank-position">#${i+1} no ranking</div>
+      <div class="rank-name">${esc(v.nome)}</div>
+
+      <div class="rank-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+          <span>Leads atribuídos</span><span style="color:${colors[i]};font-family:'DM Mono'">${v.leads}</span>
+        </div>
+        <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${(v.leads/maxLeads*100).toFixed(0)}%;background:${colors[i]}55"></div></div>
+      </div>
+
+      <div class="rank-bar-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+          <span>Com status/ação</span><span style="color:${colors[i]};font-family:'DM Mono'">${v.com_status}</span>
+        </div>
+        <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${(v.com_status/maxStatus*100).toFixed(0)}%;background:${colors[i]}"></div></div>
+      </div>
+
+      <div class="rank-stat"><span class="rank-stat-label">Taxa de ação</span><span class="rank-stat-val" style="color:${colors[i]}">${convRate}%</span></div>
+      <div class="rank-stat"><span class="rank-stat-label">Score médio carteira</span><span class="rank-stat-val">${v.score_medio > 0 ? v.score_medio : '—'}</span></div>
+      <div class="rank-stat"><span class="rank-stat-label">Pipeline estimado</span><span class="rank-stat-val" style="color:var(--green)">${fmt(v.pipeline)}</span></div>
+      <div class="rank-stat"><span class="rank-stat-label">Produto principal</span><span class="rank-stat-val" style="font-size:11px">${Object.entries(v.produtos||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]?.replace('GRI Real Estate Immersion','RE Immersion')||'—'}</span></div>
+
+      <div class="rank-activity">
+        <div class="rank-activity-title">Breakdown de atividade</div>
+        ${statusEntries.map(([s, n]) => {
+          const sl = s.toLowerCase();
+          const c = Object.entries(statusColors).find(([k]) => sl.includes(k))?.[1] || '#505068';
+          return `<div class="rank-status-row">
+            <span style="color:var(--text2)">${esc(s)}</span>
+            <span style="color:${c};font-family:'DM Mono';font-size:11px">${n}</span>
+          </div>
+          <div class="rank-status-bar" style="width:${(n/maxStatusCount*100).toFixed(0)}%;background:${c}44"></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Summary stats
+  const summaryHTML = `
+    <div class="stats-row" style="margin-bottom:24px">
+      <div class="stat-card"><div class="stat-label">👥 Vendedores ativos</div><div class="stat-value" style="color:var(--accent2)">${vendedores.length}</div></div>
+      <div class="stat-card"><div class="stat-label">📋 Total atribuído</div><div class="stat-value" style="color:var(--text)">${totalLeads}</div></div>
+      <div class="stat-card"><div class="stat-label">✅ Leads acionados</div><div class="stat-value stat-green">${totalStatus}</div></div>
+      <div class="stat-card"><div class="stat-label">💰 Pipeline do time</div><div class="stat-value stat-green">${fmt(totalPipeline)}</div></div>
+    </div>`;
+
+  // Full table (all)
+  const tableHTML = `
+    <div class="section-title" style="margin-top:8px">📊 Tabela completa</div>
+    <div class="table-wrap">
+    <table class="rank-table">
+      <thead><tr>
+        <th>#</th><th>Vendedor</th><th>Leads</th><th>Acionados</th><th>Taxa de ação</th><th>Score médio</th><th>Pipeline est.</th><th>Produto principal</th>
+      </tr></thead>
+      <tbody>
+        ${vendedores.map((v, i) => {
+          const conv = v.leads > 0 ? ((v.com_status/v.leads)*100).toFixed(0) : 0;
+          const convColor = conv >= 60 ? 'var(--green)' : conv >= 30 ? 'var(--yellow)' : 'var(--text3)';
+          const mainProd = Object.entries(v.produtos||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]?.replace('GRI Real Estate Immersion','🏠 RE Immersion').replace('Building Tomorrow','🚀 Building Tomorrow').replace('eficiêncIA','🤖 eficiêncIA') || '—';
+          return `<tr>
+            <td><span class="rank-num">${medals[i] || (i+1)}</span></td>
+            <td style="font-weight:600;color:var(--text)">${esc(v.nome)}</td>
+            <td class="rank-num">${v.leads}</td>
+            <td class="rank-num" style="color:var(--accent2)">${v.com_status}</td>
+            <td><span class="conv-rate" style="color:${convColor}">${conv}%</span></td>
+            <td class="rank-num">${v.score_medio > 0 ? v.score_medio : '—'}</td>
+            <td style="color:var(--green);font-family:'DM Mono';font-size:12px">${fmt(v.pipeline)}</td>
+            <td style="font-size:12px;color:var(--text2)">${mainProd}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    </div>`;
+
+  document.getElementById('ranking-content').innerHTML =
+    summaryHTML +
+    `<div class="rank-podium">${podiumHTML}</div>` +
+    (rest.length ? `<div style="font-size:12px;color:var(--text3);margin:0 0 8px">Demais vendedores</div>` : '') +
+    tableHTML;
+}
+
+function renderPipelineTab() {
+  const re = allLeads.filter(l => l.produto.includes('Real Estate')).length;
+  const bt = allLeads.filter(l => l.produto.includes('Building')).length;
+  const ia = allLeads.filter(l => l.produto.includes('eficiê')).length;
+  const hot = allLeads.filter(l => ['SUPER QUENTE','QUENTE'].includes(l.prioridade)).length;
+
+  const pipeRE = re * 20000 * 0.35;
+  const pipeBT = bt * 80000 * 0.25;
+  const pipeIA = ia * 3000 * 0.5;
+  const pipeTotal = pipeRE + pipeBT + pipeIA;
+
+  document.getElementById('pipeline-content').innerHTML = `
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">🏠 Real Estate Immersion</div>
+        <div class="stat-value stat-blue">${re} leads</div>
+        <div class="stat-sub">× R$20k × 35% = <strong style="color:var(--green)">${fmt(pipeRE)}</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🚀 Building Tomorrow</div>
+        <div class="stat-value" style="color:var(--accent2)">${bt} leads</div>
+        <div class="stat-sub">× R$80k × 25% = <strong style="color:var(--green)">${fmt(pipeBT)}</strong></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🤖 eficiêncIA</div>
+        <div class="stat-value stat-purple">${ia} leads</div>
+        <div class="stat-sub">× R$3k × 50% = <strong style="color:var(--green)">${fmt(pipeIA)}</strong></div>
+      </div>
+      <div class="stat-card" style="border-color:var(--green)">
+        <div class="stat-label">💰 Pipeline Total Estimado</div>
+        <div class="stat-value stat-green">${fmt(pipeTotal)}</div>
+        <div class="stat-sub">${hot} leads quentes prontos</div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:4px">
+      <div style="font-size:12px;color:var(--text3);line-height:1.8">
+        <strong style="color:var(--text2)">Metodologia de cálculo:</strong><br>
+        Real Estate: ${re} leads × R$ 20.000 × 35% conversão<br>
+        Building Tomorrow: ${bt} leads × R$ 80.000 × 25% conversão<br>
+        eficiêncIA: ${ia} leads × R$ 3.000 × 50% conversão
+      </div>
+    </div>
+  `;
+}
+
+function fmt(v) {
+  if (v >= 1e6) return 'R$ ' + (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return 'R$ ' + (v/1e3).toFixed(0) + 'k';
+  return 'R$ ' + v.toLocaleString('pt-BR');
+}
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+function openModal(id) {
+  const l = allLeads.find(x => x.id === id);
+  if (!l) return;
+  const raw = l.raw;
+  document.getElementById('modal-content').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">${esc(l.nome) || 'Lead'} ${prioChip(l.prioridade)}</div>
+    <div class="modal-row"><div class="modal-label">Empresa</div><div class="modal-val">${esc(l.empresa) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Cargo</div><div class="modal-val">${esc(l.cargo) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Cidade</div><div class="modal-val">${esc(l.cidade) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Telefone</div><div class="modal-val">${esc(l.telefone) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Email</div><div class="modal-val" style="font-size:12px">${esc(l.email) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Score</div><div class="modal-val"><span style="font-family:'DM Mono';color:var(--accent2)">${l.score || '—'}</span></div></div>
+    <div class="modal-row"><div class="modal-label">Produto</div><div class="modal-val">${prodBadge(l.produto)}</div></div>
+    <div class="modal-row"><div class="modal-label">Status</div><div class="modal-val">${statusBadge(l.status) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Responsável</div><div class="modal-val">${esc(l.responsavel) || '—'}</div></div>
+    <div class="modal-row"><div class="modal-label">Porte</div><div class="modal-val">${esc(l.porte) || '—'}</div></div>
+    ${l.telefone ? `
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Abordagem sugerida</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;background:var(--surface3);padding:12px;border-radius:8px">
+        "${esc(l.nome)}, vi que você lidera ${esc(l.cargo)||'sua área'} na ${esc(l.empresa)||'sua empresa'}. 
+        ${l.produto.includes('Real Estate') ? 'O GRI Real Estate Immersion conecta os principais líderes do setor imobiliário. Faz sentido conversarmos sobre como isso pode impactar seus resultados?' : 
+          l.produto.includes('Building') ? 'Temos apoiado líderes como você em processos de transformação através do Building Tomorrow. Faz sentido conversarmos 30 minutos?' :
+          'Temos um produto novo focado em IA aplicada ao seu mercado. Posso te apresentar em 15 minutos?'}"
+      </div>
+    </div>` : ''}
+  `;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('show');
+  }
+}
+
+// ─────────────────────────────────────────────
+// BADGES & CHIPS
+// ─────────────────────────────────────────────
+function prioChip(p) {
+  const map = {
+    'SUPER QUENTE': ['chip-fire','🔥'],
+    'QUENTE': ['chip-orange','🟠'],
+    'MORNO': ['chip-yellow','🟡'],
+    'FRIO': ['chip-blue','🔵'],
+    'MUITO FRIO': ['chip-gray','⚪'],
+  };
+  const [cls, icon] = map[p] || ['chip-gray',''];
+  return `<span class="chip ${cls}">${icon} ${p||'—'}</span>`;
+}
+
+function prodBadge(p) {
+  if (!p || p === '—') return '<span style="color:var(--text3)">—</span>';
+  if (p.includes('Real Estate')) return `<span style="color:#4fc3f7;font-size:12px">🏠 Real Estate</span>`;
+  if (p.includes('Building')) return `<span style="color:var(--accent2);font-size:12px">🚀 Building Tomorrow</span>`;
+  if (p.includes('eficiê')) return `<span style="color:var(--purple);font-size:12px">🤖 eficiêncIA</span>`;
+  return `<span style="color:var(--text3);font-size:12px">${esc(p)}</span>`;
+}
+
+function statusBadge(s) {
+  if (!s) return '';
+  const sl = s.toLowerCase();
+  if (sl.includes('declinou') || sl.includes('recusou')) return `<span class="chip chip-red">${esc(s)}</span>`;
+  if (sl.includes('natália') || sl.includes('natalia')) return `<span class="chip chip-purple">${esc(s)}</span>`;
+  if (sl.includes('enviada') || sl.includes('enviado') || sl.includes('contato')) return `<span class="chip chip-green">${esc(s)}</span>`;
+  if (sl.includes('agendada') || sl.includes('agendado') || sl.includes('reunião')) return `<span class="chip chip-blue">${esc(s)}</span>`;
+  if (sl.includes('fup') || sl.includes('follow')) return `<span class="chip chip-yellow">${esc(s)}</span>`;
+  return `<span class="chip chip-gray">${esc(s)}</span>`;
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────
+// NAV & TABS
+// ─────────────────────────────────────────────
+function updateNavCounts() {
+  const hot = allLeads.filter(l => l.prioridade === 'SUPER QUENTE' || l.prioridade === 'QUENTE').length;
+  const re = allLeads.filter(l => l.produto.includes('Real Estate')).length;
+  const bt = allLeads.filter(l => l.produto.includes('Building')).length;
+  const ia = allLeads.filter(l => l.produto.includes('eficiê')).length;
+  const sa = allLeads.filter(l => !l.status).length;
+  document.getElementById('nav-hot').textContent = hot;
+  document.getElementById('nav-all').textContent = allLeads.length;
+  document.getElementById('nav-re').textContent = re;
+  document.getElementById('nav-bt').textContent = bt;
+  document.getElementById('nav-ia').textContent = ia;
+  document.getElementById('nav-semacao').textContent = sa;
+}
+
+function buildFilterOptions() {
+  const resps = [...new Set(allLeads.map(l => l.responsavel).filter(Boolean))].sort();
+  const prods = [...new Set(allLeads.map(l => l.produto).filter(p => p && p !== '—'))].sort();
+  const statuses = [...new Set(allLeads.map(l => l.status).filter(Boolean))].sort();
+
+  ['filter-resp-leads','filter-resp-all'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '<option value="">Todos responsáveis</option>' +
+      resps.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+  });
+  ['filter-prod-leads','filter-prod-all'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '<option value="">Todos produtos</option>' +
+      prods.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  });
+  const statusSel = document.getElementById('filter-status-all');
+  if (statusSel) {
+    statusSel.innerHTML = '<option value="">Todos status</option><option value="sem-status">Sem status</option>' +
+      statuses.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  }
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  if (el) el.classList.add('active');
+
+  pages[name] = 1;
+  if (name === 'overview') renderOverview();
+  else if (name === 'pipeline') renderPipelineTab();
+  else if (name === 'ranking') renderRankingTab();
+  else {
+    const tabMap = { leads:'leads', all:'all', realestate:'re', building:'bt', eficiencia:'ia', 'sem-acao':'sa' };
+    const t = tabMap[name];
+    if (t) renderTable(t);
+  }
+}
+
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function setBadge(type, text) {
+  const b = document.getElementById('status-badge');
+  b.className = 'badge';
+  if (type === 'live') { b.classList.add('badge-live'); b.querySelector('.dot').classList.add('dot-pulse'); }
+  else if (type === 'loading') b.classList.add('badge-demo');
+  else if (type === 'error') b.classList.add('badge-error');
+  else b.classList.add('badge-demo');
+  document.getElementById('status-text').textContent = text;
+}
+
+function showGlobalAlert(cls, msg) {
+  const a = document.getElementById('global-alert');
+  const colors = {
+    'alert-info': { bg: 'rgba(79,110,247,.12)', color: '#6e87ff', border: 'rgba(79,110,247,.25)' },
+    'alert-success': { bg: 'rgba(46,204,138,.1)', color: '#2ecc8a', border: 'rgba(46,204,138,.2)' },
+    'alert-error': { bg: 'rgba(247,87,87,.1)', color: '#f75757', border: 'rgba(247,87,87,.2)' },
+  };
+  const c = colors[cls] || colors['alert-info'];
+  a.style.background = c.bg;
+  a.style.color = c.color;
+  a.style.borderBottomColor = c.border;
+  a.style.display = 'flex';
+  a.textContent = msg;
+  setTimeout(() => { a.style.display = 'none'; }, 7000);
+}
+
+function showAlert(cls, msg) {
+  // Try dashboard alert first, fallback to global
+  const a = document.getElementById('main-alert');
+  if (a && document.getElementById('dashboard').style.display !== 'none') {
+    a.className = 'alert ' + cls + ' show';
+    a.textContent = msg;
+    setTimeout(() => a.classList.remove('show'), 6000);
+  } else {
+    showGlobalAlert(cls, msg);
+  }
+}
+
+function showLoading() {
+  document.getElementById('dashboard').innerHTML = '<div class="loading"><div class="spinner"></div><span>Carregando dados...</span></div>';
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  checkOAuthCallback();
+});
+</script>
+</body>
+</html>
