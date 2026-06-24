@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Os 5 Padrões de Falha em IA · GRI Education</title>
+<meta name="description" content="95% dos projetos de IA entregam zero retorno. Descubra os 5 padrões que levam a esse resultado — e como reconhecê-los antes de investir.">
+<meta property="og:title" content="Os 5 Padrões de Falha em IA · GRI Education">
+<meta property="og:description" content="95% dos projetos de IA entregam zero retorno mensurável. O problema quase nunca é a tecnologia.">
+<meta property="og:type" content="website">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #0A1520;
+    color: #F5F0E8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page-wrapper {
+    width: 100%;
+    max-width: 800px;
+    background: #0D1B2A;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 3.5rem 2.5rem 2.5rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(197,163,97,0.2);
+  }
+
+  .eyebrow {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: #C5A361;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  .hero-title {
+    font-size: clamp(24px, 5vw, 38px);
+    font-weight: 400;
+    color: #F5F0E8;
+    line-height: 1.25;
+    max-width: 580px;
+    margin: 0 auto 1rem;
+  }
+
+  .hero-title em {
+    color: #C5A361;
+    font-style: normal;
+  }
+
+  .hero-sub {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 15px;
+    color: rgba(245,240,232,0.55);
+    max-width: 460px;
+    margin: 0 auto 2rem;
+    line-height: 1.65;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stat { text-align: center; }
+
+  .stat-num {
+    font-size: 32px;
+    font-weight: 400;
+    color: #C5A361;
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 11px;
+    color: rgba(245,240,232,0.4);
+    display: block;
+    margin-top: 6px;
+    max-width: 110px;
+    line-height: 1.45;
+  }
+
+  /* Intro bar */
+  .intro-bar {
+    padding: 1.25rem 2.5rem;
+    background: rgba(197,163,97,0.05);
+    border-bottom: 1px solid rgba(197,163,97,0.12);
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 13.5px;
+    color: rgba(245,240,232,0.6);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .intro-bar strong { color: #C5A361; font-weight: 500; }
+
+  /* Tabs */
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(197,163,97,0.15);
+    background: #0D1B2A;
+    scrollbar-width: none;
+    padding: 0 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .nav-tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 12px;
+    color: rgba(245,240,232,0.38);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+
+  .tab-btn:hover { color: rgba(245,240,232,0.72); }
+
+  .tab-btn.active {
+    color: #C5A361;
+    border-bottom-color: #C5A361;
+  }
+
+  .tab-num {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: rgba(197,163,97,0.15);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 18px;
+    font-size: 10px;
+    margin-right: 5px;
+    color: #C5A361;
+  }
+
+  .tab-btn.active .tab-num {
+    background: #C5A361;
+    color: #0D1B2A;
+  }
+
+  /* Panels */
+  .content-panel { display: none; }
+  .content-panel.active {
+    display: block;
+    animation: fadeIn 0.28s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Overview */
+  .overview-panel { padding: 2.5rem; }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 1.5rem;
+  }
+
+  .overview-card {
+    padding: 1.35rem 1.25rem;
+    border: 1px solid rgba(197,163,97,0.15);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(197,163,97,0.03);
+  }
+
+  .overview-card:hover {
+    border-color: rgba(197,163,97,0.45);
+    background: rgba(197,163,97,0.08);
+    transform: translateY(-1px);
+  }
+
+  .ov-num {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(197,163,97,0.6);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .ov-title {
+    font-size: 16px;
+    color: #F5F0E8;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+  }
+
+  .ov-tagline {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 12px;
+    color: rgba(245,240,232,0.38);
+    line-height: 1.45;
+  }
+
+  .overview-cta {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 12.5px;
+    color: rgba(245,240,232,0.35);
+    text-align: center;
+    padding-top: 0.5rem;
+  }
+
+  /* Pattern detail */
+  .pattern-hero {
+    padding: 2.25rem 2.5rem 1.5rem;
+    border-bottom: 1px solid rgba(197,163,97,0.1);
+  }
+
+  .pattern-num-label {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: rgba(197,163,97,0.55);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .pattern-title {
+    font-size: clamp(20px, 4vw, 30px);
+    font-weight: 400;
+    color: #F5F0E8;
+    margin-bottom: 0.5rem;
+    line-height: 1.25;
+  }
+
+  .pattern-tagline {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 13.5px;
+    color: rgba(245,240,232,0.45);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* Data callout */
+  .data-callout {
+    margin: 1.5rem 2.5rem;
+    padding: 1.1rem 1.4rem;
+    border-left: 2px solid #C5A361;
+    background: rgba(197,163,97,0.05);
+    border-radius: 0 5px 5px 0;
+  }
+
+  .data-callout .big-num {
+    font-size: 36px;
+    color: #C5A361;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .data-callout .big-label {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 13px;
+    color: rgba(245,240,232,0.58);
+    line-height: 1.55;
+  }
+
+  .data-callout .source {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 10.5px;
+    color: rgba(245,240,232,0.28);
+    margin-top: 0.45rem;
+    display: block;
+  }
+
+  /* Body grid */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid rgba(197,163,97,0.08);
+    border-bottom: 1px solid rgba(197,163,97,0.08);
+  }
+
+  .body-block {
+    padding: 1.75rem 2.5rem;
+    border-right: 1px solid rgba(197,163,97,0.08);
+  }
+
+  .body-block:last-child { border-right: none; }
+
+  .block-label {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #C5A361;
+    margin-bottom: 0.85rem;
+    display: block;
+  }
+
+  .block-text {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 14px;
+    color: rgba(245,240,232,0.7);
+    line-height: 1.7;
+  }
+
+  .signal-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .signal-list li {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 13.5px;
+    color: rgba(245,240,232,0.68);
+    padding: 0.4rem 0;
+    padding-left: 1.35rem;
+    position: relative;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(197,163,97,0.06);
+  }
+
+  .signal-list li:last-child { border-bottom: none; }
+
+  .signal-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #C5A361;
+    font-size: 10px;
+    top: 0.48rem;
+  }
+
+  /* Real estate box */
+  .real-estate-box {
+    margin: 1.5rem 2.5rem;
+    padding: 1.25rem 1.4rem;
+    background: rgba(197,163,97,0.07);
+    border-radius: 6px;
+    border: 1px solid rgba(197,163,97,0.14);
+  }
+
+  .re-box-label {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #C5A361;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  .re-box-text {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 13.5px;
+    color: rgba(245,240,232,0.68);
+    line-height: 1.7;
+  }
+
+  /* Nav */
+  .nav-btns {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2.5rem;
+    border-top: 1px solid rgba(197,163,97,0.1);
+    margin-top: 0.25rem;
+  }
+
+  .nav-arrow {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 12px;
+    color: #C5A361;
+    background: none;
+    border: 1px solid rgba(197,163,97,0.3);
+    padding: 0.55rem 1.2rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-arrow:hover {
+    background: rgba(197,163,97,0.1);
+    border-color: #C5A361;
+  }
+
+  .nav-arrow:disabled {
+    opacity: 0.18;
+    cursor: default;
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(197,163,97,0.22);
+    cursor: pointer;
+    transition: all 0.22s;
+    border: none;
+    padding: 0;
+  }
+
+  .dot:hover { background: rgba(197,163,97,0.45); }
+
+  .dot.active {
+    background: #C5A361;
+    width: 20px;
+    border-radius: 3px;
+  }
+
+  /* Footer */
+  .footer-bar {
+    background: rgba(197,163,97,0.04);
+    border-top: 1px solid rgba(197,163,97,0.1);
+    padding: 1.25rem 2.5rem;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-brand {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 11px;
+    color: rgba(245,240,232,0.28);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .footer-source {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 10px;
+    color: rgba(245,240,232,0.2);
+    line-height: 1.5;
+    text-align: right;
+    max-width: 340px;
+  }
+
+  /* Responsive */
+  @media (max-width: 580px) {
+    .hero { padding: 2.5rem 1.5rem 2rem; }
+    .stat-row { gap: 1.5rem; }
+    .intro-bar { padding: 1rem 1.5rem; }
+    .overview-panel { padding: 1.5rem; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .body-grid { grid-template-columns: 1fr; }
+    .body-block { border-right: none; border-bottom: 1px solid rgba(197,163,97,0.08); padding: 1.5rem; }
+    .pattern-hero { padding: 1.75rem 1.5rem 1.25rem; }
+    .data-callout { margin: 1.25rem 1.5rem; }
+    .real-estate-box { margin: 1.25rem 1.5rem; }
+    .nav-btns { padding: 1rem 1.5rem; }
+    .footer-bar { padding: 1rem 1.5rem; flex-direction: column; align-items: flex-start; }
+    .footer-source { text-align: left; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <div class="hero">
+    <span class="eyebrow">GRI Education · Inteligência Artificial no Real Estate</span>
+    <h1 class="hero-title">Os <em>5 Padrões de Falha</em><br>em IA que ninguém mapeia</h1>
+    <p class="hero-sub">95% dos projetos de IA entregam zero retorno mensurável. O problema quase nunca é a tecnologia.</p>
+    <div class="stat-row">
+      <div class="stat">
+        <span class="stat-num">95%</span>
+        <span class="stat-label">dos projetos de GenAI não geram retorno</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">42%</span>
+        <span class="stat-label">das empresas abandonaram iniciativas em 2025</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">1 em 100</span>
+        <span class="stat-label">chega a produção com impacto real</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="intro-bar">
+    <strong>Por que isso acontece?</strong> Depois de analisar dezenas de implementações no mercado imobiliário brasileiro, identificamos 5 padrões que aparecem repetidamente — e que podem ser corrigidos antes de gerar prejuízo.
+  </div>
+
+  <nav class="nav-tabs" role="tablist" aria-label="Padrões de falha em IA">
+    <button class="tab-btn active" onclick="showTab('overview')" role="tab" aria-selected="true">Visão geral</button>
+    <button class="tab-btn" onclick="showTab(0)" role="tab" aria-selected="false"><span class="tab-num">1</span> Ferramenta sem problema</button>
+    <button class="tab-btn" onclick="showTab(1)" role="tab" aria-selected="false"><span class="tab-num">2</span> Piloto eterno</button>
+    <button class="tab-btn" onclick="showTab(2)" role="tab" aria-selected="false"><span class="tab-num">3</span> IA sem contexto</button>
+    <button class="tab-btn" onclick="showTab(3)" role="tab" aria-selected="false"><span class="tab-num">4</span> ROI invisível</button>
+    <button class="tab-btn" onclick="showTab(4)" role="tab" aria-selected="false"><span class="tab-num">5</span> Pessoas ignoradas</button>
+  </nav>
+
+  <!-- Overview -->
+  <div id="panel-overview" class="content-panel active" role="tabpanel">
+    <div class="overview-panel">
+      <div class="overview-grid">
+        <div class="overview-card" onclick="showTab(0)">
+          <span class="ov-num">Padrão 01</span>
+          <p class="ov-title">Ferramenta sem problema</p>
+          <p class="ov-tagline">A tecnologia foi escolhida antes de entender o que precisava ser resolvido</p>
+        </div>
+        <div class="overview-card" onclick="showTab(1)">
+          <span class="ov-num">Padrão 02</span>
+          <p class="ov-title">Piloto eterno</p>
+          <p class="ov-tagline">O projeto funciona em demo, trava na operação real e nunca sai do piloto</p>
+        </div>
+        <div class="overview-card" onclick="showTab(2)">
+          <span class="ov-num">Padrão 03</span>
+          <p class="ov-title">IA sem contexto do negócio</p>
+          <p class="ov-tagline">A ferramenta não foi treinada com o vocabulário e as particularidades do setor</p>
+        </div>
+        <div class="overview-card" onclick="showTab(3)">
+          <span class="ov-num">Padrão 04</span>
+          <p class="ov-title">ROI invisível</p>
+          <p class="ov-tagline">Ninguém definiu o que seria medido antes de começar — o retorno existe, mas não aparece</p>
+        </div>
+        <div class="overview-card" onclick="showTab(4)">
+          <span class="ov-num">Padrão 05</span>
+          <p class="ov-title">As pessoas foram ignoradas</p>
+          <p class="ov-tagline">A tecnologia foi implementada sem preparar a equipe para adotá-la de forma consistente</p>
+        </div>
+      </div>
+      <p class="overview-cta">Clique em qualquer padrão para aprofundar → ou use as abas acima</p>
+    </div>
+  </div>
+
+  <!-- Pattern 1 -->
+  <div id="panel-0" class="content-panel" role="tabpanel">
+    <div class="pattern-hero">
+      <span class="pattern-num-label">Padrão 01 de 05</span>
+      <h2 class="pattern-title">Ferramenta sem problema</h2>
+      <p class="pattern-tagline">"Compramos a ferramenta, agora vamos decidir onde usar."</p>
+    </div>
+    <div class="data-callout">
+      <span class="big-num">72%</span>
+      <span class="big-label">dos CIOs reportam empate ou perda nos investimentos em IA feitos nos últimos 2 anos</span>
+      <span class="source">Dados agregados de mercado, 2024–25</span>
+    </div>
+    <div class="body-grid">
+      <div class="body-block">
+        <span class="block-label">O que acontece</span>
+        <p class="block-text">A empresa compra uma licença ou contrata uma plataforma de IA motivada por pressão competitiva ou curiosidade. A tecnologia chega antes de qualquer mapeamento de processo. As equipes são obrigadas a "usar IA" sem clareza sobre qual problema ela resolve — e o resultado é adoção forçada que não gera resultado.</p>
+      </div>
+      <div class="body-block">
+        <span class="block-label">Sinais de alerta</span>
+        <ul class="signal-list">
+          <li>A decisão de adotar IA partiu de uma feira, não de um problema real</li>
+          <li>A equipe não consegue explicar o que mudou depois da implementação</li>
+          <li>Ninguém sabe qual processo foi acelerado ou eliminado</li>
+          <li>A ferramenta está paga, mas subutilizada</li>
+          <li>O argumento para comprar foi "nosso concorrente usa"</li>
+        </ul>
+      </div>
+    </div>
+    <div class="real-estate-box">
+      <span class="re-box-label">No Real Estate</span>
+      <p class="re-box-text">Incorporadoras que adotam plataformas de IA para "análise de mercado" sem definir quais decisões de portfólio essa análise vai alimentar. O dado chega, ninguém sabe o que fazer com ele. O processo correto começa pelo problema: qualificação de leads lenta, análise de terrenos que demora 3 dias, propostas comerciais que travam o funil — e só então escolhe a ferramenta correspondente.</p>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-arrow" disabled aria-disabled="true">← anterior</button>
+      <div class="progress-dots" aria-hidden="true">
+        <button class="dot active" onclick="showTab(0)"></button>
+        <button class="dot" onclick="showTab(1)"></button>
+        <button class="dot" onclick="showTab(2)"></button>
+        <button class="dot" onclick="showTab(3)"></button>
+        <button class="dot" onclick="showTab(4)"></button>
+      </div>
+      <button class="nav-arrow" onclick="showTab(1)">próximo →</button>
+    </div>
+  </div>
+
+  <!-- Pattern 2 -->
+  <div id="panel-1" class="content-panel" role="tabpanel">
+    <div class="pattern-hero">
+      <span class="pattern-num-label">Padrão 02 de 05</span>
+      <h2 class="pattern-title">Piloto eterno</h2>
+      <p class="pattern-tagline">"Está funcionando bem no teste. Quando estivermos prontos, escalamos."</p>
+    </div>
+    <div class="data-callout">
+      <span class="big-num">20 de 100</span>
+      <span class="big-label">empresas chegam à fase de piloto. Só uma sai com impacto real em produção</span>
+      <span class="source">MIT Sloan, 2025</span>
+    </div>
+    <div class="body-grid">
+      <div class="body-block">
+        <span class="block-label">O que acontece</span>
+        <p class="block-text">O piloto entrega resultados parciais e a empresa entra em um ciclo interminável de ajustes. A cada rodada de revisão, surgem novos requisitos e novos stakeholders com novas demandas. O projeto sobrevive como piloto por meses ou anos — e nunca impacta a operação real.</p>
+      </div>
+      <div class="body-block">
+        <span class="block-label">Sinais de alerta</span>
+        <ul class="signal-list">
+          <li>O piloto tem mais de 3 meses e ninguém definiu critério de aprovação</li>
+          <li>O sucesso foi declarado, mas o processo real não mudou</li>
+          <li>A equipe de TI está envolvida, mas o time de negócios não usa</li>
+          <li>Há relatórios do piloto, mas sem comparativo com a situação anterior</li>
+          <li>A pergunta "quando vai para produção?" não tem data de resposta</li>
+        </ul>
+      </div>
+    </div>
+    <div class="real-estate-box">
+      <span class="re-box-label">No Real Estate</span>
+      <p class="re-box-text">Corretoras que testam automação de qualificação de leads com uma parcela dos contatos, obtêm resultado positivo no recorte — e nunca migram o processo inteiro. O piloto funciona. A operação principal continua igual. A diferença entre quem usa IA e quem testa IA está na disposição de redefinir o processo antes de escalar, não de aguardar o momento perfeito para fazê-lo.</p>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-arrow" onclick="showTab(0)">← anterior</button>
+      <div class="progress-dots" aria-hidden="true">
+        <button class="dot" onclick="showTab(0)"></button>
+        <button class="dot active" onclick="showTab(1)"></button>
+        <button class="dot" onclick="showTab(2)"></button>
+        <button class="dot" onclick="showTab(3)"></button>
+        <button class="dot" onclick="showTab(4)"></button>
+      </div>
+      <button class="nav-arrow" onclick="showTab(2)">próximo →</button>
+    </div>
+  </div>
+
+  <!-- Pattern 3 -->
+  <div id="panel-2" class="content-panel" role="tabpanel">
+    <div class="pattern-hero">
+      <span class="pattern-num-label">Padrão 03 de 05</span>
+      <h2 class="pattern-title">IA sem contexto do negócio</h2>
+      <p class="pattern-tagline">"Usamos o ChatGPT. Às vezes funciona, às vezes sai coisa estranha."</p>
+    </div>
+    <div class="data-callout">
+      <span class="big-num">67%</span>
+      <span class="big-label">mais chances de sucesso quando a implementação conta com especialistas no domínio, não só em tecnologia</span>
+      <span class="source">MIT Sloan, 2025</span>
+    </div>
+    <div class="body-grid">
+      <div class="body-block">
+        <span class="block-label">O que acontece</span>
+        <p class="block-text">A empresa usa ferramentas genéricas sem alimentá-las com o contexto específico do setor, da empresa e dos clientes. A IA responde de forma tecnicamente correta — mas errada para o negócio. Outputs precisam de revisão pesada, a confiança cai, e a equipe volta a fazer tudo manualmente.</p>
+      </div>
+      <div class="body-block">
+        <span class="block-label">Sinais de alerta</span>
+        <ul class="signal-list">
+          <li>Os outputs de IA precisam de reescrita antes de serem usados</li>
+          <li>A ferramenta não sabe o que é VGV, FII, IBIN ou incorporação</li>
+          <li>Os prompts são escritos do zero toda vez, sem padrão ou template</li>
+          <li>A voz de marca não aparece nos textos gerados</li>
+          <li>O time usa IA para tarefas simples, mas evita nas complexas</li>
+        </ul>
+      </div>
+    </div>
+    <div class="real-estate-box">
+      <span class="re-box-label">No Real Estate</span>
+      <p class="re-box-text">Gestores de fundos imobiliários que pedem análises de portfólio para IA sem fornecer dados históricos, critérios de risco da casa, lógica de precificação ou terminologia do setor. A resposta é genérica e inútil. Contexto não é opcional — é a diferença entre uma ferramenta que acelera e uma que só gera retrabalho. IA especializada no setor imobiliário brasileiro tem performance radicalmente diferente de IA genérica.</p>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-arrow" onclick="showTab(1)">← anterior</button>
+      <div class="progress-dots" aria-hidden="true">
+        <button class="dot" onclick="showTab(0)"></button>
+        <button class="dot" onclick="showTab(1)"></button>
+        <button class="dot active" onclick="showTab(2)"></button>
+        <button class="dot" onclick="showTab(3)"></button>
+        <button class="dot" onclick="showTab(4)"></button>
+      </div>
+      <button class="nav-arrow" onclick="showTab(3)">próximo →</button>
+    </div>
+  </div>
+
+  <!-- Pattern 4 -->
+  <div id="panel-3" class="content-panel" role="tabpanel">
+    <div class="pattern-hero">
+      <span class="pattern-num-label">Padrão 04 de 05</span>
+      <h2 class="pattern-title">ROI invisível</h2>
+      <p class="pattern-tagline">"Estamos usando IA, mas não sabemos dizer se gerou resultado."</p>
+    </div>
+    <div class="data-callout">
+      <span class="big-num">40%</span>
+      <span class="big-label">das economias de tempo estimadas são perdidas em retrabalho causado por outputs sem qualidade</span>
+      <span class="source">Workday, jan 2026 — 3.200 respondentes</span>
+    </div>
+    <div class="body-grid">
+      <div class="body-block">
+        <span class="block-label">O que acontece</span>
+        <p class="block-text">A empresa adota IA, sente que algo melhorou — mas não tem como provar. Nenhuma métrica foi definida antes da implementação. O sucesso é subjetivo, o investimento fica difícil de justificar, e na primeira pressão de budget o projeto é cortado. O ROI existe, mas é invisível porque nunca foi desenhado para aparecer.</p>
+      </div>
+      <div class="body-block">
+        <span class="block-label">Sinais de alerta</span>
+        <ul class="signal-list">
+          <li>Não há baseline documentado do processo antes da IA</li>
+          <li>Ninguém sabe quantas horas foram economizadas por semana</li>
+          <li>O sucesso é medido por "a equipe gostou" ou "parece mais rápido"</li>
+          <li>Nenhum indicador de conversão foi associado à implementação</li>
+          <li>O relatório para a diretoria é qualitativo, não quantitativo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="real-estate-box">
+      <span class="re-box-label">No Real Estate</span>
+      <p class="re-box-text">Incorporadoras que implementam IA na geração de descrições de imóveis e medem sucesso pelo volume de textos criados — não pelo tempo economizado, pela taxa de conversão das páginas ou pela consistência de voz de marca. Benchmarks do setor: qualificação de leads com IA reduz 60–70% do tempo de pré-atendimento; análise de terrenos cai de 3 dias para 2 horas. Esses números precisam ser medidos desde o primeiro dia, não depois.</p>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-arrow" onclick="showTab(2)">← anterior</button>
+      <div class="progress-dots" aria-hidden="true">
+        <button class="dot" onclick="showTab(0)"></button>
+        <button class="dot" onclick="showTab(1)"></button>
+        <button class="dot" onclick="showTab(2)"></button>
+        <button class="dot active" onclick="showTab(3)"></button>
+        <button class="dot" onclick="showTab(4)"></button>
+      </div>
+      <button class="nav-arrow" onclick="showTab(4)">próximo →</button>
+    </div>
+  </div>
+
+  <!-- Pattern 5 -->
+  <div id="panel-4" class="content-panel" role="tabpanel">
+    <div class="pattern-hero">
+      <span class="pattern-num-label">Padrão 05 de 05</span>
+      <h2 class="pattern-title">As pessoas foram ignoradas</h2>
+      <p class="pattern-tagline">"A ferramenta está disponível. Por que ninguém está usando?"</p>
+    </div>
+    <div class="data-callout">
+      <span class="big-num">25%</span>
+      <span class="big-label">das empresas brasileiras têm ao menos um caso de uso de IA — mas 67% dizem que é prioridade estratégica</span>
+      <span class="source">Bain & Company Brasil, maio 2025</span>
+    </div>
+    <div class="body-grid">
+      <div class="body-block">
+        <span class="block-label">O que acontece</span>
+        <p class="block-text">A liderança implementa IA como um projeto de tecnologia, não como uma mudança cultural. A equipe não foi preparada, não entende por que a mudança é necessária e sente que a ferramenta é uma ameaça. A adoção é baixa, o uso é superficial, e a tecnologia fica subutilizada por resistência não endereçada.</p>
+      </div>
+      <div class="body-block">
+        <span class="block-label">Sinais de alerta</span>
+        <ul class="signal-list">
+          <li>A ferramenta foi lançada sem treinamento estruturado</li>
+          <li>A equipe usa IA só quando é obrigada, não por escolha</li>
+          <li>Há medo de que a IA substitua funções existentes</li>
+          <li>Ninguém na equipe se tornou referência interna no uso</li>
+          <li>A liderança não usa a ferramenta — só pede que os outros usem</li>
+        </ul>
+      </div>
+    </div>
+    <div class="real-estate-box">
+      <span class="re-box-label">No Real Estate</span>
+      <p class="re-box-text">Corretoras onde o gestor adquire um sistema de automação de follow-up, mas não envolve a equipe comercial na configuração nem comunica o impacto esperado. Os corretores sentem que o sistema vai roubar os clientes deles. O uso cai para zero em 30 dias. A implementação bem-sucedida começa pelo CEO — que adota, comunica e demonstra — e avança gradualmente, começando por 5 processos-piloto escolhidos com a equipe, não impostos a ela.</p>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-arrow" onclick="showTab(3)">← anterior</button>
+      <div class="progress-dots" aria-hidden="true">
+        <button class="dot" onclick="showTab(0)"></button>
+        <button class="dot" onclick="showTab(1)"></button>
+        <button class="dot" onclick="showTab(2)"></button>
+        <button class="dot" onclick="showTab(3)"></button>
+        <button class="dot active" onclick="showTab(4)"></button>
+      </div>
+      <button class="nav-arrow" disabled aria-disabled="true">próximo →</button>
+    </div>
+  </div>
+
+  <footer class="footer-bar">
+    <span class="footer-brand">GRI Education · gri.com.br</span>
+    <span class="footer-source">Fontes: MIT Sloan 2025 · Bain &amp; Company Brasil mai/2025 · Workday jan/2026 · Dados agregados de mercado 2024–25</span>
+  </footer>
+
+</div>
+
+<script>
+  function showTab(id) {
+    var panels = document.querySelectorAll('.content-panel');
+    var tabs = document.querySelectorAll('.tab-btn');
+    panels.forEach(function(p) { p.classList.remove('active'); });
+    tabs.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+
+    if (id === 'overview') {
+      document.getElementById('panel-overview').classList.add('active');
+      tabs[0].classList.add('active');
+      tabs[0].setAttribute('aria-selected', 'true');
+    } else {
+      document.getElementById('panel-' + id).classList.add('active');
+      tabs[id + 1].classList.add('active');
+      tabs[id + 1].setAttribute('aria-selected', 'true');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+</script>
+
+</body>
+</html>
