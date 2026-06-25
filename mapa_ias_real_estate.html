@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Mapa das IAs no Real Estate · GRI Education</title>
+<meta name="description" content="80+ ferramentas de IA organizadas por função + 10 situações práticas com prompts prontos para o mercado imobiliário.">
+<meta property="og:title" content="O Mapa das IAs no Real Estate · GRI Education">
+<meta property="og:description" content="80+ ferramentas organizadas por função + 10 prompts prontos para usar hoje no mercado imobiliário.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Georgia','Times New Roman',serif;background:#0A1520;color:#F5F0E8;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.page{width:100%;max-width:860px;background:#0D1B2A;min-height:100vh;display:flex;flex-direction:column}
+.hero{padding:3rem 2.5rem 2.5rem;text-align:center;border-bottom:1px solid rgba(197,163,97,.2)}
+.eyebrow{font-family:Arial,sans-serif;font-size:11px;letter-spacing:.18em;color:#C5A361;text-transform:uppercase;margin-bottom:1.25rem;display:block}
+.hero h1{font-size:clamp(22px,5vw,36px);font-weight:400;line-height:1.25;max-width:560px;margin:0 auto 1rem}
+.hero h1 em{color:#C5A361;font-style:normal}
+.hero-sub{font-family:Arial,sans-serif;font-size:14px;color:rgba(245,240,232,.5);max-width:480px;margin:0 auto 2rem;line-height:1.65}
+.stat-row{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap}
+.stat-num{font-size:30px;color:#C5A361;display:block;line-height:1}
+.stat-lbl{font-family:Arial,sans-serif;font-size:11px;color:rgba(245,240,232,.38);display:block;margin-top:6px;max-width:110px;line-height:1.45}
+.main-tabs{display:flex;border-bottom:1px solid rgba(197,163,97,.15);background:#0D1B2A;padding:0 1.5rem;position:sticky;top:0;z-index:20}
+.main-tab{font-family:Arial,sans-serif;font-size:13px;color:rgba(245,240,232,.4);background:none;border:none;cursor:pointer;padding:1rem 1.5rem;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s;letter-spacing:.02em}
+.main-tab:hover{color:rgba(245,240,232,.72)}
+.main-tab.on{color:#C5A361;border-bottom-color:#C5A361}
+.section{display:none}
+.section.on{display:block;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.cat-tabs{display:flex;overflow-x:auto;scrollbar-width:none;padding:1rem 2rem .75rem;gap:8px;border-bottom:1px solid rgba(197,163,97,.1)}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-btn{font-family:Arial,sans-serif;font-size:11px;color:rgba(245,240,232,.5);background:rgba(197,163,97,.06);border:1px solid rgba(197,163,97,.15);cursor:pointer;padding:.45rem .9rem;border-radius:20px;white-space:nowrap;transition:all .2s;letter-spacing:.03em}
+.cat-btn:hover{background:rgba(197,163,97,.12);color:rgba(245,240,232,.8)}
+.cat-btn.on{background:rgba(197,163,97,.15);border-color:#C5A361;color:#C5A361}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:1.5rem 2rem}
+.tool-card{background:rgba(197,163,97,.04);border:1px solid rgba(197,163,97,.12);border-radius:6px;padding:1.1rem;transition:border-color .2s}
+.tool-card:hover{border-color:rgba(197,163,97,.38)}
+.tool-name{font-family:Arial,sans-serif;font-size:13.5px;font-weight:500;color:#F5F0E8;margin-bottom:3px}
+.tool-url{font-family:Arial,sans-serif;font-size:10px;color:#C5A361;opacity:.65;margin-bottom:8px}
+.tool-desc{font-family:Arial,sans-serif;font-size:12px;color:rgba(245,240,232,.6);line-height:1.55;margin-bottom:7px}
+.tool-best{font-family:Arial,sans-serif;font-size:10.5px;color:rgba(197,163,97,.65);font-style:italic;line-height:1.45}
+.sit-list{padding:1.25rem 2rem;display:flex;flex-direction:column;gap:10px}
+.sit-card{background:rgba(197,163,97,.04);border:1px solid rgba(197,163,97,.12);border-radius:6px;overflow:hidden}
+.sit-head{display:flex;align-items:center;gap:12px;padding:.9rem 1.25rem;cursor:pointer;transition:background .2s}
+.sit-head:hover{background:rgba(197,163,97,.08)}
+.sit-num{font-family:Arial,sans-serif;font-size:10px;color:#C5A361;background:rgba(197,163,97,.15);border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sit-title{font-family:Arial,sans-serif;font-size:13.5px;color:#F5F0E8;flex:1}
+.sit-arrow{font-family:Arial,sans-serif;font-size:16px;color:rgba(197,163,97,.45);transition:transform .2s;line-height:1}
+.sit-arrow.open{transform:rotate(90deg)}
+.sit-body{display:none;padding:0 1.25rem 1.25rem;border-top:1px solid rgba(197,163,97,.08)}
+.sit-body.open{display:block}
+.lbl{font-family:Arial,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#C5A361;margin:.9rem 0 .4rem;display:block}
+.tool-val{font-family:Arial,sans-serif;font-size:13px;color:rgba(245,240,232,.65);margin-bottom:.9rem}
+.prompt-box{background:rgba(0,0,0,.3);border:1px solid rgba(197,163,97,.18);border-radius:5px;padding:1rem;margin-bottom:.6rem}
+.prompt-text{font-family:'Courier New',monospace;font-size:12px;color:rgba(245,240,232,.75);line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.copy-btn{font-family:Arial,sans-serif;font-size:10.5px;color:#C5A361;background:rgba(197,163,97,.1);border:1px solid rgba(197,163,97,.25);padding:.35rem .8rem;border-radius:3px;cursor:pointer;transition:all .2s;display:inline-block;margin-bottom:.9rem}
+.copy-btn:hover{background:rgba(197,163,97,.2)}
+.copy-btn.copied{color:#4CAF50;border-color:#4CAF50;background:rgba(76,175,80,.1)}
+.result-val{font-family:Arial,sans-serif;font-size:12.5px;color:rgba(245,240,232,.52);line-height:1.65}
+.footer{background:rgba(197,163,97,.04);border-top:1px solid rgba(197,163,97,.1);padding:1.25rem 2rem;margin-top:auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.footer-brand{font-family:Arial,sans-serif;font-size:11px;color:rgba(245,240,232,.25);letter-spacing:.1em;text-transform:uppercase}
+.footer-note{font-family:Arial,sans-serif;font-size:10px;color:rgba(245,240,232,.18);line-height:1.5;text-align:right}
+@media(max-width:600px){
+  .hero{padding:2.5rem 1.5rem 2rem}
+  .stat-row{gap:1.5rem}
+  .main-tabs{padding:0 .75rem}
+  .cat-tabs{padding:.75rem 1.25rem .5rem}
+  .tools-grid{grid-template-columns:1fr;padding:1.25rem 1.5rem}
+  .sit-list{padding:1rem 1.5rem}
+  .sit-body{padding:0 1rem 1rem}
+  .footer{padding:1rem 1.5rem;flex-direction:column;align-items:flex-start}
+  .footer-note{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hero">
+  <span class="eyebrow">GRI Education · eficiêncIA para mercado imobiliário</span>
+  <h1>O Mapa das IAs<br><em>no Real Estate</em></h1>
+  <p class="hero-sub">80+ ferramentas organizadas por função + 10 situações práticas com prompts prontos para copiar e usar hoje.</p>
+  <div class="stat-row">
+    <div><span class="stat-num">80+</span><span class="stat-lbl">ferramentas mapeadas</span></div>
+    <div><span class="stat-num">7</span><span class="stat-lbl">categorias por função</span></div>
+    <div><span class="stat-num">10</span><span class="stat-lbl">prompts prontos para usar</span></div>
+  </div>
+</div>
+
+<nav class="main-tabs">
+  <button class="main-tab on" onclick="showMain('ferramentas',this)">Mapa de ferramentas</button>
+  <button class="main-tab" onclick="showMain('prompts',this)">Prompts prontos</button>
+</nav>
+
+<div id="sec-ferramentas" class="section on">
+  <div class="cat-tabs" id="cat-tabs-container"></div>
+  <div id="tools-container" class="tools-grid"></div>
+</div>
+
+<div id="sec-prompts" class="section">
+  <div class="sit-list" id="sits-container"></div>
+</div>
+
+<footer class="footer">
+  <span class="footer-brand">GRI Education · gri.com.br</span>
+  <span class="footer-note">Fontes: JLL 2025 · McKinsey · Morgan Stanley · MIT Sloan · Bain &amp; Company Brasil</span>
+</footer>
+
+</div>
+
+<script>
+var TOOLS={
+  conversacional:{label:'Conversacionais',tools:[
+    {name:'ChatGPT',url:'openai.com',desc:'Texto, voz, imagem, arquivos. Versátil para qualquer tarefa.',best:'Brainstorming, conteúdo, tarefas variadas do dia a dia'},
+    {name:'Claude',url:'claude.ai',desc:'Destaque em documentos longos e raciocínio complexo. Lê até 500 páginas de uma vez.',best:'Contratos, relatórios, análises profundas e estruturadas'},
+    {name:'Gemini',url:'gemini.google.com',desc:'Integrada ao Google Workspace. Analisa dados direto no Sheets, Drive e Gmail.',best:'Quem vive no ecossistema Google'},
+    {name:'Perplexity',url:'perplexity.ai',desc:'Pesquisa com IA em tempo real. Entrega análise com fontes citadas.',best:'Pesquisa de mercado, concorrência, dados atualizados'},
+    {name:'Copilot',url:'copilot.microsoft.com',desc:'IA da Microsoft no Office 365. Word, Excel, PowerPoint, Outlook.',best:'Quem opera no ecossistema Microsoft'},
+    {name:'DeepSeek',url:'deepseek.com',desc:'IA de código aberto. Alto desempenho, custo menor.',best:'Alternativa de alto desempenho, hospedagem própria'},
+    {name:'Grok',url:'grok.com',desc:'Integrada ao X (Twitter). Acesso a posts e tendências em tempo real.',best:'Monitoramento de conversas em tempo real'},
+  ]},
+  dados:{label:'Pesquisa e dados',tools:[
+    {name:'Perplexity',url:'perplexity.ai',desc:'Pesquisa em tempo real com fontes verificáveis.',best:'Pesquisa de mercado rápida com embasamento'},
+    {name:'Claude',url:'claude.ai',desc:'Upload de planilhas, PDFs, documentos. Análise em linguagem natural.',best:'Análise exploratória de dados internos'},
+    {name:'Gemini no Sheets',url:'gemini.google.com',desc:'IA direto na planilha. Análise, gráficos e fórmulas sem sair do Sheets.',best:'Dados de vendas, pipeline, controle de obra'},
+    {name:'Julius',url:'julius.ai',desc:'Análise de dados visual para não-programadores. Gráficos e correlações automáticas.',best:'Visualizações rápidas para reunião'},
+    {name:'NotebookLM',url:'notebooklm.google.com',desc:'Carrega até 50 documentos. Cruza fontes, gera resumos e até podcasts.',best:'Consolidar múltiplos relatórios, preparar reuniões'},
+    {name:'Consensus',url:'consensus.app',desc:'Pesquisa em artigos científicos. Mostra consenso entre estudos.',best:'Embasar decisões com evidência acadêmica'},
+    {name:'Rows',url:'rows.com',desc:'Planilha com IA nativa. Puxa dados de APIs, dashboards que se atualizam sozinhos.',best:'Relatórios recorrentes, KPIs automatizados'},
+  ]},
+  conteudo:{label:'Conteúdo e design',tools:[
+    {name:'Midjourney',url:'midjourney.com',desc:'Imagens fotorrealistas. Staging virtual, renders, ambientes decorados.',best:'Staging de unidades à venda. Qualidade de revista'},
+    {name:'DALL-E',url:'openai.com',desc:'Gera imagens dentro do ChatGPT. Prático para variações rápidas.',best:'Imagens durante o fluxo de trabalho'},
+    {name:'Ideogram',url:'ideogram.ai',desc:'Gera imagens com texto legível dentro. Logos, banners, cards.',best:'Peças de marketing com tipografia integrada'},
+    {name:'Krea AI',url:'krea.ai',desc:'Aprimora fotos de imóveis. Troca móveis, iluminação, amplia.',best:'Edição avançada de fotos de imóveis'},
+    {name:'Heygen',url:'heygen.com',desc:'Vídeos com avatar realista a partir de texto. Português brasileiro.',best:'Vídeos de anúncio sem equipe de filmagem'},
+    {name:'Runway',url:'runwayml.com',desc:'Geração e edição de vídeo com IA. Qualidade cinematográfica.',best:'Vídeos conceituais de empreendimento'},
+    {name:'ElevenLabs',url:'elevenlabs.io',desc:'Clona voz com IA. Áudio natural em português.',best:'Follow-up por áudio personalizado em escala'},
+    {name:'Canva Magic Studio',url:'canva.com',desc:'Suite completa: texto, foto, variações, todos os formatos.',best:'Peças para múltiplos canais sem designer'},
+    {name:'Gamma',url:'gamma.app',desc:'Apresentações visuais a partir de texto ou dados.',best:'Propostas, board reports em minutos'},
+    {name:'Adobe Firefly',url:'firefly.adobe.com',desc:'IA generativa integrada ao Photoshop e Premiere. Licenciamento garantido.',best:'Produção profissional com garantia de uso comercial'},
+  ]},
+  automacao:{label:'Automação',tools:[
+    {name:'Zapier',url:'zapier.com',desc:'7.000+ integrações. A mais acessível para começar.',best:'Primeiras automações. Curva de aprendizado mínima'},
+    {name:'Make',url:'make.com',desc:'Automação visual entre aplicativos. Etapas com IA integrada.',best:'Fluxos entre site, CRM, email, WhatsApp e planilhas'},
+    {name:'n8n',url:'n8n.io',desc:'Automação código aberto. Pode rodar nos servidores da empresa.',best:'Controle total sobre automações e dados'},
+    {name:'Lindy',url:'lindy.ai',desc:'Agentes de IA sem código. Conecta CRM, email, WhatsApp, calendário.',best:'Qualificação de leads e follow-up automático 24h'},
+    {name:'Relevance AI',url:'relevanceai.com',desc:'Agentes com raciocínio complexo. Múltiplas etapas com decisão.',best:'Análise de oportunidades, triagem de propostas'},
+    {name:'Clay',url:'clay.com',desc:'Enriquecimento de dados + outreach personalizado.',best:'Listas de prospecção com contexto real sobre cada contato'},
+    {name:'Instantly',url:'instantly.ai',desc:'Outreach por email em escala. Personalização com IA.',best:'Prospecção de investidores e compradores B2B'},
+  ]},
+  codigo:{label:'Código e produto',tools:[
+    {name:'Lovable',url:'lovable.dev',desc:'Constrói aplicações web completas via linguagem natural.',best:'Landing pages, dashboards, calculadoras, formulários'},
+    {name:'Bolt',url:'bolt.new',desc:'Similar ao Lovable, foco em velocidade de prototipagem.',best:'Testar ideias de produto digital em horas'},
+    {name:'V0',url:'v0.dev',desc:'Gera componentes visuais: formulários, tabelas, dashboards.',best:'Novas telas e componentes para sistemas existentes'},
+    {name:'Cursor',url:'cursor.com',desc:'Editor de código com IA. Entende o projeto inteiro.',best:'Times de dev que querem entregar 2-5x mais rápido'},
+    {name:'Replit',url:'replit.com',desc:'Desenvolvimento completo no navegador. Sem instalar nada.',best:'Quem quer construir algo técnico sem setup'},
+    {name:'Airtable',url:'airtable.com',desc:'Banco de dados visual com IA. Interface de planilha.',best:'Pipeline de terrenos, controle de fornecedores, gestão de obra'},
+  ]},
+  're-vendas':{label:'RE · Vendas',tools:[
+    {name:'Morada.ai',url:'morada.ai',desc:'3,7M atendimentos em 2025. 200 incorporadoras no Brasil. Cyrela, Direcional, Patrimar.',best:'Atendimento e qualificação em escala no Brasil'},
+    {name:'EliseAI',url:'eliseai.com',desc:'Líder global em IA para gestão residencial. Leasing 24/7.',best:'Gestão de locação residencial automatizada'},
+    {name:'Structurely',url:'structurely.com',desc:'Qualificação de leads via texto e email com conversas naturais.',best:'Follow-up inteligente que não parece robô'},
+    {name:'Ylopo',url:'ylopo.com',desc:'Marketing digital + chatbot de qualificação 24/7.',best:'Corretoras que precisam gerar e qualificar leads online'},
+    {name:'Rechat',url:'rechat.com',desc:'CRM com marketing integrado. Gera CMAs, flyers, campanhas.',best:'Corretores que querem tudo em uma plataforma'},
+  ]},
+  're-obras':{label:'RE · Obras',tools:[
+    {name:'Procore',url:'procore.com',desc:'Gestão de obra completa. 16.000+ clientes. IA para riscos e cronograma.',best:'Incorporadoras com múltiplas obras simultâneas'},
+    {name:'Doxel',url:'doxel.com',desc:'Visão computacional: compara obra real com BIM automaticamente.',best:'Monitoramento de progresso sem vistoria manual'},
+    {name:'OpenSpace',url:'openspace.ai',desc:'Câmeras 360° com IA. Documentação visual + detecção de mudanças.',best:'Registro contínuo e comparação de etapas da obra'},
+    {name:'Briq',url:'briq.com',desc:'IA financeira para construção. Previsão de fluxo de caixa e custos.',best:'Controle financeiro e forecast de obra'},
+    {name:'Buildots',url:'buildots.com',desc:'Câmeras em capacetes. Monitoramento contínuo sem caminhadas dedicadas.',best:'Acompanhamento de obra sem interromper operação'},
+  ]},
+  're-juridico':{label:'RE · Jurídico',tools:[
+    {name:'Kira Systems',url:'kirasystems.com',desc:'Extrai 1.000+ tipos de cláusula. 450.000 docs/mês.',best:'Due diligence em alto volume de contratos'},
+    {name:'V7 Go',url:'v7labs.com',desc:'8 agentes para RE. Custo de contrato de US$1.000 para US$100.',best:'Reduzir custo e tempo de análise jurídica'},
+    {name:'Diald AI',url:'diald.com',desc:"Due diligence com 1,7M fontes. Memos em horas. Parceria com Moody's.",best:'Fundos e incorporadoras com volume de aquisições'},
+    {name:'Plotzy',url:'plotzy.ai',desc:'Compliance de zoneamento automático. Relatórios prontos para financing.',best:'Análise de viabilidade regulatória de terrenos'},
+  ]},
+  're-mercado':{label:'RE · Mercado',tools:[
+    {name:'Propdo',url:'propdo.com',desc:'Precificação preditiva 99,6%. Projeta valores futuros. Opera no Brasil.',best:'Valuation e precificação com dados reais'},
+    {name:'HouseCanary',url:'housecanary.com',desc:'Analytics preditivo. Valuation, previsão de preços, risco por ativo.',best:'Análise de risco e oportunidade por ativo'},
+    {name:'Land Insight',url:'landinsight.io',desc:'Mapa interativo: zoneamento, propriedade, oportunidades de desenvolvimento.',best:'Prospecção de terrenos com inteligência de dados'},
+    {name:'CompStak',url:'compstak.com',desc:'Dados de leases e transações verificados por rede de profissionais.',best:'Comparáveis de mercado verificados'},
+    {name:'Matterport',url:'matterport.com',desc:'Tours 3D e digital twins. Usado por Zillow e Redfin.',best:'Apresentação imersiva de imóveis à distância'},
+    {name:'Virtual Staging AI',url:'virtualstagingai.app',desc:'Staging sobre foto real mantendo perspectiva e iluminação.',best:'Decorar fotos de imóveis vazios em minutos'},
+  ]},
+};
+
+var SITS=[
+  {n:'01',title:'Comparar terrenos e decidir qual analisar primeiro',tool:'Claude ou ChatGPT (upload de planilha)',prompt:'Tenho 3 terrenos em análise. Vou colar os dados de cada um (localização, metragem, zoneamento, preço pedido, coeficiente de aproveitamento). Compare os três considerando: potencial construtivo em m², custo por m² construído estimado, VGV potencial baseado no preço médio de venda da região, e risco regulatório. Monte uma tabela comparativa e recomende qual analisar primeiro e por quê.',result:'Use a tabela como base para a reunião de decisão. Peça à IA para aprofundar na opção recomendada: "agora faça um estudo de viabilidade preliminar desse terreno."'},
+  {n:'02',title:'Definir o mix de produto do próximo lançamento',tool:'Claude ou ChatGPT (upload de dados de mercado)',prompt:'Estou desenvolvendo um empreendimento de [X] unidades na região [X]. O terreno permite [X] m² de área construída. Vou colar dados dos últimos lançamentos da região (nome, tipologia, metragem, preço/m², velocidade de vendas). Com base nesses dados, sugira o mix ideal: quantas unidades por tipologia (studio, 1D, 2D, 3D), faixa de metragem para cada uma, faixa de preço recomendada, e justificativa baseada nos dados.',result:'Cruze com dados internos dos seus últimos lançamentos. Peça à IA: "agora vou colar os dados de vendas dos meus últimos 3 lançamentos. Compare os padrões do mercado com os meus próprios resultados."'},
+  {n:'03',title:'Criar staging virtual de unidade à venda',tool:'Midjourney',prompt:'Interior design photograph of a [tamanho] living room in a luxury Brazilian apartment, floor-to-ceiling windows overlooking [vista], contemporary minimalist style, light oak floors, neutral palette with [cor] accents, late afternoon natural light, Architectural Digest editorial quality, 4k --ar 16:9',result:'Gere 4 variações e selecione a melhor. Para resultado sobre foto real existente, use Virtual Staging AI (virtualstagingai.app) em vez de Midjourney.'},
+  {n:'04',title:'Pesquisar mercado e concorrência com dados atuais',tool:'Perplexity',prompt:'Qual a tendência de preço de imóveis residenciais na região [X] nos últimos 2 anos? Quais fatores explicam a variação? Quais são os lançamentos mais recentes na região, por quais incorporadoras, e em que faixa de preço? Cite as fontes.',result:'Use como briefing antes de reuniões de decisão. Para aprofundar, cole o resultado no Claude: "com base nesse cenário, quais são os 3 maiores riscos e as 3 maiores oportunidades para uma incorporadora na região?"'},
+  {n:'05',title:'Qualificar leads automaticamente',tool:'ChatGPT ou Claude (para o fluxo) + Lindy (para implementar)',prompt:'Monte um fluxo de qualificação para WhatsApp com 5 perguntas que identifiquem: (1) se o lead é comprador ou investidor, (2) faixa de preço, (3) região de interesse, (4) urgência de compra em meses, (5) se já tem crédito aprovado. Ao final, classifique como quente, morno ou frio e sugira a ação para cada: agendar visita, enviar material, ou nutrir por conteúdo. Escreva cada mensagem no tom que um corretor usaria no WhatsApp.',result:'Implemente o fluxo no Lindy (lindy.ai) conectando ao seu CRM e WhatsApp. O agente roda 24h. Para operações maiores, considere Morada.ai como solução integrada.'},
+  {n:'06',title:'Fazer follow-up personalizado em escala',tool:'Claude ou ChatGPT + ElevenLabs (para áudio)',prompt:'Tenho uma lista de 15 leads que visitaram meu empreendimento esta semana. Vou colar os dados de cada um (nome, tipologia de interesse, o que mais chamou atenção na visita, principal objeção). Para cada lead, escreva uma mensagem de WhatsApp de follow-up que: pareça pessoal, reforce o que chamou atenção na visita, trate a objeção com leveza, e termine com pergunta aberta. Máximo 4 linhas por mensagem.',result:'Para follow-up por áudio (maior taxa de resposta), pegue o texto de cada mensagem e gere o áudio no ElevenLabs com a voz clonada do gestor comercial.'},
+  {n:'07',title:'Gerar o board report do mês',tool:'Claude (upload dos dados das áreas)',prompt:'Vou colar os dados de resultado de 4 áreas (vendas, obra, marketing, financeiro) referentes ao mês de [mês]. Para cada área, gere: resumo em 2 linhas do que aconteceu, comparação com meta e com mês anterior, semáforo (verde/amarelo/vermelho), e o principal risco identificado. Ao final, faça uma síntese estratégica: como o mês foi, o que precisa de atenção imediata, e as 3 prioridades para o próximo mês. Formato: 1 página, pronto para enviar ao conselho.',result:'Revise os semáforos e a síntese (a IA pode errar priorização política). Cole no Gamma (gamma.app) para transformar em apresentação visual em 2 minutos.'},
+  {n:'08',title:'Simular cenários para decisão de investimento',tool:'Claude ou ChatGPT',prompt:'Estou avaliando [descreva: novo lançamento, aquisição de terreno, expansão para nova região]. Os dados são: [cole as variáveis: custo, receita estimada, prazo, taxa de juros, condições de mercado]. Simule 3 cenários: otimista (melhor caso), base (premissas conservadoras), e pessimista (mercado piora). Para cada cenário, projete: receita, custo, margem, prazo de retorno, e os 3 principais riscos. Apresente em tabela comparativa e recomende qual usar como base para a decisão.',result:'Leve os 3 cenários para a reunião de decisão. Se o cenário pessimista ainda for viável, a decisão fica mais fácil de defender.'},
+  {n:'09',title:'Analisar contrato e identificar riscos',tool:'Claude (upload do PDF)',prompt:'Vou fazer upload de um contrato de [tipo: compra e venda / locação / parceria / financiamento]. Extraia: partes envolvidas, objeto, valor e condições de pagamento, prazo e condições de rescisão, as 5 cláusulas de maior risco para mim como [papel], todas as obrigações com prazo definido (com datas), e qualquer cláusula incomum. Apresente em tabela com uma coluna de alertas para os itens que exigem atenção do jurídico.',result:'Use como briefing para o time jurídico. Em vez de "analise este contrato", você chega com "identifiquei estes 5 pontos de risco, preciso do seu parecer sobre cada um."'},
+  {n:'10',title:'Diagnosticar a saúde do negócio',tool:'Claude ou ChatGPT',prompt:'Aja como um consultor estratégico sênior contratado para fazer um diagnóstico rápido da minha empresa. Contexto: [descreva o que a empresa faz, porte, mercado de atuação, número de lançamentos/ano, principais números do último trimestre, o que mais te preocupa hoje]. Me entregue: os 3 maiores riscos que provavelmente estou subestimando, as 3 maiores oportunidades que provavelmente não estou explorando, e a 1 decisão que deveria tomar este mês mas estou adiando. Seja específico e use os dados fornecidos para justificar cada ponto.',result:'Leia com ceticismo saudável — a IA não conhece seu negócio como você. Mas a perspectiva externa frequentemente ilumina pontos cegos. Os insights mais valiosos costumam vir das "oportunidades que você não está explorando."'},
+];
+
+var currentCat='conversacional';
+
+function showMain(id,btn){
+  document.querySelectorAll('.main-tab').forEach(function(b){b.classList.remove('on')});
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('on')});
+  document.getElementById('sec-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+
+function buildCatTabs(){
+  var c=document.getElementById('cat-tabs-container');
+  Object.keys(TOOLS).forEach(function(key){
+    var btn=document.createElement('button');
+    btn.className='cat-btn'+(key===currentCat?' on':'');
+    btn.textContent=TOOLS[key].label;
+    btn.onclick=function(){showCat(key,btn)};
+    c.appendChild(btn);
+  });
+}
+
+function showCat(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('on')});
+  if(btn)btn.classList.add('on');
+  var c=document.getElementById('tools-container');
+  c.innerHTML='';
+  (TOOLS[cat].tools||[]).forEach(function(t){
+    var d=document.createElement('div');
+    d.className='tool-card';
+    d.innerHTML='<div class="tool-name">'+t.name+'</div><div class="tool-url">'+t.url+'</div><div class="tool-desc">'+t.desc+'</div><div class="tool-best">Melhor para: '+t.best+'</div>';
+    c.appendChild(d);
+  });
+}
+
+function toggleSit(i){
+  var body=document.getElementById('sb-'+i);
+  var arrow=document.getElementById('sa-'+i);
+  var open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  arrow.classList.toggle('open',!open);
+}
+
+function copyPrompt(i){
+  var btn=document.getElementById('cp-'+i);
+  navigator.clipboard.writeText(SITS[i].prompt).then(function(){
+    btn.textContent='Copiado!';
+    btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copiar prompt';btn.classList.remove('copied')},2000);
+  });
+}
+
+(function init(){
+  buildCatTabs();
+  showCat('conversacional',null);
+  document.querySelector('.cat-btn').classList.add('on');
+  var c=document.getElementById('sits-container');
+  SITS.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.className='sit-card';
+    d.innerHTML='<div class="sit-head" onclick="toggleSit('+i+')"><span class="sit-num">'+s.n+'</span><span class="sit-title">'+s.title+'</span><span class="sit-arrow" id="sa-'+i+'">›</span></div><div class="sit-body" id="sb-'+i+'"><span class="lbl">Ferramenta</span><div class="tool-val">'+s.tool+'</div><div class="prompt-box"><div class="prompt-text">'+s.prompt+'</div></div><button class="copy-btn" id="cp-'+i+'" onclick="copyPrompt('+i+')">Copiar prompt</button><span class="lbl" style="margin-top:.5rem">O que fazer com o resultado</span><div class="result-val">'+s.result+'</div></div>';
+    c.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
